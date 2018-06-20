@@ -1,4 +1,4 @@
-package com.example.spring.base;
+package com.example.spring.other;
 
 import java.io.File;
 import java.util.Properties;
@@ -19,6 +19,7 @@ public class MailTest {
 	private final static String EMAIL_HOST = "";
 	private final static String EMAIL_USERNAME = "";
 	private final static String EMAIL_PASSWORD = "";
+
 	
 	public void sendEmail(String fileName, String to) throws MessagingException {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -53,4 +54,9 @@ public class MailTest {
 	    //发送邮件
 		mailSender.send(mimeMessage);
 	}
+
+	public static void main(String[] args) throws MessagingException {
+	    MailTest mail = new MailTest();
+	    mail.sendEmail("", "");
+    }
 }
