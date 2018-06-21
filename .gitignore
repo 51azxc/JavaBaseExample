@@ -1,11 +1,23 @@
-# Eclipse project
-/.settings/
-/target/
+.settings/
+target/
 bin/
+build/
+./code/
+.gradle/
+.idea/
+*/.settings/
+*/target/
+*/build/
+*/.vertx/
+*/src/META-INF/
+*/src/main/java/META-INF/
+*.log
 .classpath
 .project
 .DS_Store
 *.jar
 *.class
-/.idea
+*.iml
+
+
 

@@ -31,7 +31,6 @@ import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.stream.ChunkedFile;
 import io.netty.util.CharsetUtil;
 
-
 public class HttpFileServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 	private final String url;

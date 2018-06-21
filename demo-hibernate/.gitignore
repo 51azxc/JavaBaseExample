@@ -1,9 +1,0 @@
-# Eclipse project
-/.settings/
-/target/
-bin/
-.classpath
-.project
-.DS_Store
-*.jar
-*.class
