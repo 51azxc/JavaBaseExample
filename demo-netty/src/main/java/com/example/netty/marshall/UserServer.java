@@ -2,8 +2,8 @@ package com.example.netty.marshall;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -26,7 +26,9 @@ public class UserServer {
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel ch) throws Exception {
+						//加入Marshall解码器
 						ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+						//加入Marshall编码器
 						ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
 						ch.pipeline().addLast(new UserServerHandler());
 					}
@@ -46,7 +48,7 @@ public class UserServer {
 	}
 }
 
-class UserServerHandler extends ChannelHandlerAdapter {
+class UserServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		UserInfo userInfo = (UserInfo)msg;

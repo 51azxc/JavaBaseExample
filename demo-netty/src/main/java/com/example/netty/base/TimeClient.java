@@ -4,8 +4,8 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -15,7 +15,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class TimeClient {
 	
-	private class TimeClientHandler extends ChannelHandlerAdapter {
+	private class TimeClientHandler extends ChannelInboundHandlerAdapter {
 		
 		private final ByteBuf firstMsg;
 		

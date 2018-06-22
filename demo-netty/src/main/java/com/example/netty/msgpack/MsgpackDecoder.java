@@ -10,8 +10,10 @@ public class MsgpackDecoder extends MessageToMessageDecoder<ByteBuf> {
 		final byte[] array;
 		final int length = arg1.readableBytes();
 		array = new byte[length];
+		//获取需要解码的byte数组
 		arg1.getBytes(arg1.readerIndex(), array, 0, length);
 		MessagePack msgpack = new MessagePack();
+		//通过reader方法完成反序列化Object对象，加入到解码列表arg2中
 		arg2.add(msgpack.read(array));
 	}
 }

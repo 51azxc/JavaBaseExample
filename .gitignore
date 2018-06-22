@@ -1,23 +1,46 @@
-.settings/
+# Operating System Files
+*.DS_Store
+Thumbs.db
+
+# Build Files
 target/
 bin/
 build/
-./code/
-.gradle/
-.idea/
-*/.settings/
-*/target/
-*/build/
-*/.vertx/
+# */target/
+# */build/
 */src/META-INF/
 */src/main/java/META-INF/
 *.log
-.classpath
-.project
-.DS_Store
 *.jar
 *.class
+
+# Eclipse Project Files
+.settings/
+.classpath
+.project
+# */.settings/
+
+# Intellij IDEA Project Files
+.idea/
 *.iml
+*.ipr
+*.iws
+*.idea
+
+# Gradle Project Files
+.gradle/
+
+# Vertx Project Files
+*/.vertx/
+
+# VS Code Project Files
+./code/
+
+# Spring Bootstrap artifacts
+out/
+
+
+
 
 
 

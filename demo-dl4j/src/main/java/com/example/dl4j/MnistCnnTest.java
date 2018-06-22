@@ -48,8 +48,8 @@ public class MnistCnnTest {
                 .layer(0, new ConvolutionLayer.Builder(5, 5)
                         .nIn(channels)
                         .stride(1, 1)
-                        .nOut(20)
-                        .activation(Activation.IDENTITY)
+                        .nOut(32)
+                        .activation(Activation.RELU)
                         .build())
                 .layer(1, new SubsamplingLayer.Builder(PoolingType.MAX)
                         .kernelSize(2, 2)
@@ -57,15 +57,15 @@ public class MnistCnnTest {
                         .build())
                 .layer(2, new ConvolutionLayer.Builder(5, 5)
                         .stride(1, 1)
-                        .nOut(50)
-                        .activation(Activation.IDENTITY)
+                        .nOut(64)
+                        .activation(Activation.RELU)
                         .build())
                 .layer(3, new SubsamplingLayer.Builder(PoolingType.MAX)
                         .kernelSize(2, 2)
                         .stride(2, 2)
                         .build())
                 .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
-                        .nOut(500)
+                        .nOut(1024)
                         .build())
                 .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .nOut(outputNum)
@@ -84,7 +84,7 @@ public class MnistCnnTest {
             log.info("*** Completed epoch {} ***", i);
             log.info("Evaluate model....");
             Evaluation eval = model.evaluate(mnistTest);
-            System.out.println(eval.stats());
+            log.info(eval.stats());
             mnistTest.reset();
         }
         log.info("****************Example finished********************");

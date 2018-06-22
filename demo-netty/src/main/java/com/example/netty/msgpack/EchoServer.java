@@ -2,8 +2,8 @@ package com.example.netty.msgpack;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -16,7 +16,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 public class EchoServer {
-	class EchoServerHandler extends ChannelHandlerAdapter {
+	class EchoServerHandler extends ChannelInboundHandlerAdapter {
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 			System.out.println("Server receive the msgpack message: " + msg.toString());
@@ -45,9 +45,13 @@ public class EchoServer {
 				.childHandler(new ChannelInitializer<SocketChannel>() {
 					@Override
 					protected void initChannel(SocketChannel arg0) throws Exception {
+						//处理tcp粘包问题，增加2个字节的消息长度字段
 						arg0.pipeline().addLast("frameDecoder", new LengthFieldBasedFrameDecoder(1024, 0,  2, 0, 2));
+						//添加msgpack解码器
 						arg0.pipeline().addLast("msgpack decoder", new MsgpackDecoder());
+						//处理tcp半包问题
 						arg0.pipeline().addLast("frameEncoder", new LengthFieldPrepender(2));
+						////添加msgpack编码器
 						arg0.pipeline().addLast("msgpack encoder", new MsgpackEncoder());
 						arg0.pipeline().addLast(new EchoServerHandler());
 					}

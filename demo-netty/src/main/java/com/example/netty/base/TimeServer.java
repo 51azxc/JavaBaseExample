@@ -4,8 +4,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -15,12 +15,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class TimeServer {
 	
-	private class TimeServerHandler extends ChannelHandlerAdapter{
+	private class TimeServerHandler extends ChannelInboundHandlerAdapter{
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 			ByteBuf buf = (ByteBuf) msg;
 			byte[] req = new byte[buf.readableBytes()];
 			buf.readBytes(req);
+			//获取到客户端请求的数据
 			String body = new String(req, "UTF-8");
 			System.out.println("The time server receive order: " + body);
 			String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? 
@@ -43,11 +44,13 @@ public class TimeServer {
 	}
 	
 	public void bind(int port) throws Exception {
-		//接受客户端的连接
+		//NioEventLoopGroup为线程组，专门用于处理网络事件，即Reactor数组
+		//用于接受客户端的连接
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
-		//使用SocketChannel读写
+		//用于进行SocketChannel读写
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
+			//辅助启动类，降低复杂度
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, workerGroup)
 				.channel(NioServerSocketChannel.class)

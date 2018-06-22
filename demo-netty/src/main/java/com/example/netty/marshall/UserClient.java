@@ -2,8 +2,8 @@ package com.example.netty.marshall;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -39,7 +39,7 @@ public class UserClient {
 	}
 }
 
-class UserClientHandler extends ChannelHandlerAdapter {
+class UserClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		for (int i = 0; i < 10; i++) {
