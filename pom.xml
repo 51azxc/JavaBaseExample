@@ -13,5 +13,6 @@
   	<module>demo-netty</module>
   	<module>demo-springboot-webflux</module>
   	<module>demo-springboot-swagger2</module>
+  	<module>demo-javase</module>
   </modules>
 </project>
