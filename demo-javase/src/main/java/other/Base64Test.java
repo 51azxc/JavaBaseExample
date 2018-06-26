@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,8 +18,12 @@ import javax.imageio.ImageIO;
 
 public class Base64Test {
 
-	public static void main(String[] args) {
-		
+	public static void main(String[] args) throws UnsupportedEncodingException {
+		String str = "Hello world";
+		String encodeStr = Base64Util.encode(str.getBytes("utf-8"));
+		System.out.println("encode str: " + encodeStr);
+		String decodeStr = new String(Base64Util.decode(encodeStr), "utf-8");
+		System.out.println("decode str: " + decodeStr);
 	}
 	
 	//文件流 -> base64
