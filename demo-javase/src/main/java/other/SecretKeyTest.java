@@ -1,9 +1,14 @@
 package other;
 
+import java.security.SecureRandom;
+import java.util.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.DESedeKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /*
@@ -42,43 +47,106 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class SecretKeyTest {
 	
+	private final static String KEY_ALGORITHM_DES = "DES";
+	private final static String KEY_ALGORITHM_3DES = "DESede";
+	private final static String KEY_ALGORITHM_AES = "AES";
+	//算法名称/加密模式/填充方式 
+	private final static String MODE_DES = "DES/ECB/PKCS5Padding";
+	private final static String MODE_3DES = "DESede/CBC/PKCS5Padding";
+	private final static String MODE_AES = "AES/ECB/PKCS5Padding";
+	
 	public static void main(String[] args) throws Exception {
-		System.out.println("----------AES加密解密----------");
 		String str = "HelloWorld";
+		System.out.println("origin: " + str);
+		
+		System.out.println("----------DES加密解密----------");
+		String desKey = "ABCDEFG012345678";
+		String desEncryptStr = encryptWithDES(str, desKey);
+		System.out.println("DES Encrypt: " + desEncryptStr);
+		String desDecryptStr = decryptWithDES(desEncryptStr, desKey);
+		System.out.println("DES Decrypt: " + desDecryptStr);
+		
+		System.out.println("----------3DES加密解密----------");
+		String desedeKey = "ABCDEFG0123456789abcdefg";
+		//CBC模式需要添加向量，作用跟盐(salt)差不多，添加密码复杂度
+		String iv = "01234567";
+		String desedeEncryptStr = encryptWith3DES(str, desedeKey, iv);
+		System.out.println("3DES Encrypt: " + desedeEncryptStr);
+		String desedeDesDecryptStr = decryptWith3DES(desedeEncryptStr, desedeKey, iv);
+		System.out.println("3DES Decrypt: " + desedeDesDecryptStr);
+		
+		System.out.println("----------AES加密解密----------");
 		//使用AES-128-ECB加密模式，key需要为16位
 		String aesKey = "0123456789abcdef";
-		String aesEncryptStr = useAESEncrypt(str, aesKey);
-		System.out.println("DES Encrypt: " + aesEncryptStr);
-		String aesDecryptStr = useAESDecrypt(aesEncryptStr, aesKey);
-		System.out.println("DES Decrypt: " + aesDecryptStr);
+		String aesEncryptStr = encryptWithAES(str, aesKey);
+		System.out.println("AES Encrypt: " + aesEncryptStr);
+		String aesDecryptStr = decryptWithAES(aesEncryptStr, aesKey);
+		System.out.println("AES Decrypt: " + aesDecryptStr);
 	}
 	
-	public static String useDESEncrypt(String data, String key) throws Exception {
-		final DESKeySpec desKey = new DESKeySpec(key.getBytes("utf-8"));
-		final SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-	    final SecretKey securekey = keyFactory.generateSecret(desKey);
-	    Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-		cipher.init(Cipher.ENCRYPT_MODE, securekey);
-		return Base64Util.encode(cipher.doFinal(data.getBytes("utf-8")));
+	public static String encryptWithDES(String data, String key) throws Exception {
+	    Cipher cipher = Cipher.getInstance(MODE_DES);
+		cipher.init(Cipher.ENCRYPT_MODE, generateDESKey(key), new SecureRandom());
+		byte[] bytes = cipher.doFinal(data.getBytes("utf-8"));
+		//使用JDK自带的Base64工具类编码
+		return Base64.getEncoder().encodeToString(bytes);
+	}
+	
+	public static String decryptWithDES(String data, String key) throws Exception {
+	    Cipher cipher = Cipher.getInstance(MODE_DES);
+	    cipher.init(Cipher.DECRYPT_MODE, generateDESKey(key));
+	    //使用JDK自带的Base64工具类解码
+	    byte[] bytes = Base64.getDecoder().decode(data);
+	    return new String(cipher.doFinal(bytes), "utf-8");
+	}
+	
+	private static SecretKey generateDESKey(String key) throws Exception {
+		DESKeySpec keySpec = new DESKeySpec(key.getBytes("utf-8"));
+		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(KEY_ALGORITHM_DES);
+	    SecretKey secureKey = keyFactory.generateSecret(keySpec);
+	    return secureKey;
+	}
+	
+	public static String encryptWith3DES(String data, String key, String iv) throws Exception {
+		Cipher cipher = Cipher.getInstance(MODE_3DES);
+		IvParameterSpec ivParaSepc = new IvParameterSpec(iv.getBytes("utf-8"));
+		cipher.init(Cipher.ENCRYPT_MODE, gengerate3DESKey(key), ivParaSepc);
+		byte[] bytes = cipher.doFinal(data.getBytes("utf-8"));
+		//使用JDK自带的Base64工具类编码
+		return Base64.getEncoder().encodeToString(bytes);
+	}
+	public static String decryptWith3DES(String data, String key, String iv) throws Exception {
+		Cipher cipher = Cipher.getInstance(MODE_3DES);
+		IvParameterSpec ivParaSepc = new IvParameterSpec(iv.getBytes("utf-8"));
+	    cipher.init(Cipher.DECRYPT_MODE, gengerate3DESKey(key), ivParaSepc);
+	    //使用JDK自带的Base64工具类解码
+	    byte[] bytes = Base64.getDecoder().decode(data);
+	    return new String(cipher.doFinal(bytes), "utf-8");
+	}
+	
+	private static SecretKey gengerate3DESKey(String key) throws Exception {
+		DESedeKeySpec keySpec = new DESedeKeySpec(key.getBytes("utf-8"));
+		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(KEY_ALGORITHM_3DES);
+	    SecretKey secureKey = keyFactory.generateSecret(keySpec);
+	    return secureKey;
 	}
 	
 	//使用AES算法加密
-	public static String useAESEncrypt(String data, String key) throws Exception {
-		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), "AES");
-		//算法名称/加密模式/填充方式 
-		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	public static String encryptWithAES(String data, String key) throws Exception {
+		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), KEY_ALGORITHM_AES);
+		Cipher cipher = Cipher.getInstance(MODE_AES);
 		cipher.init(Cipher.ENCRYPT_MODE, spec);
 		byte[] bytes  = cipher.doFinal(data.getBytes("utf-8"));
-		//base64编码
-		return Base64Util.encode(bytes);
+		//使用JDK自带的Base64工具类编码
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 	
-	public static String useAESDecrypt(String data, String key) throws Exception {
-		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), "AES");
-		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	public static String decryptWithAES(String data, String key) throws Exception {
+		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), KEY_ALGORITHM_AES);
+		Cipher cipher = Cipher.getInstance(MODE_AES);
 		cipher.init(Cipher.DECRYPT_MODE, spec);
-		//base64解码
-		byte[] bytes = Base64Util.decode(data);
+		//使用JDK自带的Base64工具类解码
+		byte[] bytes = Base64.getDecoder().decode(data);
 		return new String(cipher.doFinal(bytes), "utf-8");
 	}
 

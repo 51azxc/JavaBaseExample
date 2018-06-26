@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +15,8 @@ import javax.imageio.ImageIO;
 
 /*
  * Base64编码相关操作
+ * 
+ * jdk8已有自带的Base64操作类
  */
 
 public class Base64Test {
@@ -24,6 +27,11 @@ public class Base64Test {
 		System.out.println("encode str: " + encodeStr);
 		String decodeStr = new String(Base64Util.decode(encodeStr), "utf-8");
 		System.out.println("decode str: " + decodeStr);
+		//使用JDK自带的Base64操作类
+		String base64EncodeStr = Base64.getEncoder().encodeToString(str.getBytes("utf-8"));
+		System.out.println("base64EncodeStr: " + base64EncodeStr);
+		byte[] base64Decode = Base64.getDecoder().decode(base64EncodeStr);
+		System.out.println("base64DecodeStr: " + new String(base64Decode));
 	}
 	
 	//文件流 -> base64
