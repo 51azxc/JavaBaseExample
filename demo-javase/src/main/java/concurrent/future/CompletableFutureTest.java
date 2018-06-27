@@ -322,7 +322,8 @@ public class CompletableFutureTest {
 		System.out.println("thenComposeAsync result: " + futureAsync.join());
 	}
 	
-	/* 从一组CompletableFuture中获取任意返回的结果 */
+	/* 从一组CompletableFuture中获取任意返回的结果。
+	 * 类似CountLatchDown */
 	public static void useAnyOfMethod() {
 		List<String> messages = Arrays.asList("a", "b", "c");
 		List<CompletableFuture<String>> futures = messages.stream()

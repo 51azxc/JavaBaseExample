@@ -1,4 +1,4 @@
-package other;
+package collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +20,7 @@ public class CollectionsTest {
 	/*
 	 * 遍历Map
 	 */
-	public void mapIterator() {
+	public static void mapIterator() {
 		Map<String,String> map = new HashMap<String, String>();
 		map.put("1", "a");
 		map.put("2", "s");
@@ -52,7 +52,7 @@ public class CollectionsTest {
 	/*
 	 * 列表与数组互转
 	 */
-	public void listConvertTo() {
+	public static void listConvertToArray() {
 		String[] ss = new String[]{"a","d","c","b"};
 		//String[] -> list<String>
 		ArrayList<String> list = new ArrayList<String>();
@@ -70,8 +70,10 @@ public class CollectionsTest {
 	
 	/*
 	 * 使用Comparator接口排序
+	 * 
+	 * Comparator不需要排序类实现，因此可以给一些不可被继承的final类排序，例如String
 	 */
-	public void sortUseComparator() {
+	public static void sortUseComparator() {
 		class Student{
 			String name;
 			int age;
@@ -110,8 +112,10 @@ public class CollectionsTest {
 	
 	/*
 	 * 使用Comparable接口排序
+	 * 
+	 * Comparable需要排序的类实现Comparable接口
 	 */
-	public void sortUseComparable() {
+	public static void sortUseComparable() {
 		class Student implements Comparable<Student>{
 		    String name;
 			int age;
@@ -147,8 +151,4 @@ public class CollectionsTest {
 		//通过默认方法进行排序
 		Collections.sort(sl);
 	}
-	
-	
-	
-
 }

@@ -85,24 +85,32 @@ public class SecretKeyTest {
 	}
 	
 	public static String encryptWithDES(String data, String key) throws Exception {
+		//生成Cipher对象用于完成加密操作
 	    Cipher cipher = Cipher.getInstance(MODE_DES);
+	    //指定工作模式为加密
 		cipher.init(Cipher.ENCRYPT_MODE, generateDESKey(key), new SecureRandom());
+		//执行加密操作
 		byte[] bytes = cipher.doFinal(data.getBytes("utf-8"));
 		//使用JDK自带的Base64工具类编码
 		return Base64.getEncoder().encodeToString(bytes);
 	}
 	
 	public static String decryptWithDES(String data, String key) throws Exception {
+		//生成Cipher对象用于完成解密操作
 	    Cipher cipher = Cipher.getInstance(MODE_DES);
+	    //指定工作模式为解密
 	    cipher.init(Cipher.DECRYPT_MODE, generateDESKey(key));
 	    //使用JDK自带的Base64工具类解码
 	    byte[] bytes = Base64.getDecoder().decode(data);
+	    //解密并生成对应的字符串
 	    return new String(cipher.doFinal(bytes), "utf-8");
 	}
 	
+	/* 生成DES密钥 */
 	private static SecretKey generateDESKey(String key) throws Exception {
-		DESKeySpec keySpec = new DESKeySpec(key.getBytes("utf-8"));
+		//创建密钥工厂
 		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(KEY_ALGORITHM_DES);
+		DESKeySpec keySpec = new DESKeySpec(key.getBytes("utf-8"));
 	    SecretKey secureKey = keyFactory.generateSecret(keySpec);
 	    return secureKey;
 	}
@@ -112,32 +120,31 @@ public class SecretKeyTest {
 		IvParameterSpec ivParaSepc = new IvParameterSpec(iv.getBytes("utf-8"));
 		cipher.init(Cipher.ENCRYPT_MODE, gengerate3DESKey(key), ivParaSepc);
 		byte[] bytes = cipher.doFinal(data.getBytes("utf-8"));
-		//使用JDK自带的Base64工具类编码
 		return Base64.getEncoder().encodeToString(bytes);
 	}
+	
 	public static String decryptWith3DES(String data, String key, String iv) throws Exception {
 		Cipher cipher = Cipher.getInstance(MODE_3DES);
 		IvParameterSpec ivParaSepc = new IvParameterSpec(iv.getBytes("utf-8"));
 	    cipher.init(Cipher.DECRYPT_MODE, gengerate3DESKey(key), ivParaSepc);
-	    //使用JDK自带的Base64工具类解码
 	    byte[] bytes = Base64.getDecoder().decode(data);
 	    return new String(cipher.doFinal(bytes), "utf-8");
 	}
 	
+	/* 生成3DES密钥 */
 	private static SecretKey gengerate3DESKey(String key) throws Exception {
-		DESedeKeySpec keySpec = new DESedeKeySpec(key.getBytes("utf-8"));
 		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(KEY_ALGORITHM_3DES);
+		DESedeKeySpec keySpec = new DESedeKeySpec(key.getBytes("utf-8"));
 	    SecretKey secureKey = keyFactory.generateSecret(keySpec);
 	    return secureKey;
 	}
 	
-	//使用AES算法加密
+	/* 使用AES算法加密 */
 	public static String encryptWithAES(String data, String key) throws Exception {
 		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), KEY_ALGORITHM_AES);
 		Cipher cipher = Cipher.getInstance(MODE_AES);
 		cipher.init(Cipher.ENCRYPT_MODE, spec);
 		byte[] bytes  = cipher.doFinal(data.getBytes("utf-8"));
-		//使用JDK自带的Base64工具类编码
 		return Base64.getEncoder().encodeToString(bytes);
 	}
 	
@@ -145,7 +152,6 @@ public class SecretKeyTest {
 		SecretKeySpec spec = new SecretKeySpec(key.getBytes("utf-8"), KEY_ALGORITHM_AES);
 		Cipher cipher = Cipher.getInstance(MODE_AES);
 		cipher.init(Cipher.DECRYPT_MODE, spec);
-		//使用JDK自带的Base64工具类解码
 		byte[] bytes = Base64.getDecoder().decode(data);
 		return new String(cipher.doFinal(bytes), "utf-8");
 	}

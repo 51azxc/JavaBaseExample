@@ -1,4 +1,4 @@
-package other;
+package collections;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,13 +18,14 @@ public class TableConvertToTree {
 		TreeA a5 = new TreeA(2, 0, "東京支店");
 		TreeA a6 = new TreeA(1, 0, "北海道支店");
 		List<TreeA> list = Arrays.asList(a1, a2, a3, a4, a5, a6);
+		//通过parentId分组
 		Map<Integer, List<TreeA>> groups = list.stream().collect(Collectors.groupingBy(TreeA::getParentId));
+		//将符合条件的对象放入子数组中，并且过滤掉顶级节点
 		list.stream().map(a->{
 			a.children = groups.get(a.id);
 			return a;
 		}).filter(a->a.getParentId()==0).forEach(System.out::println);
 	}
-
 }
 
 class TreeA {
