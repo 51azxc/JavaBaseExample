@@ -8,7 +8,7 @@
   	<module>demo-javaee</module>
   	<module>demo-hibernate</module>
   	<module>demo-spring</module>
-  	<module>demo-other</module>
+  	
   	<module>demo-dl4j</module>
   	<module>demo-netty</module>
   	<module>demo-springboot-webflux</module>

@@ -17,37 +17,55 @@ import java.nio.charset.CharsetDecoder;
 /*
  * 使用IO/NIO对文件进行操作
  * 
- * 传统IO是基于字节流和字符流进行操作。它是面向流(Stream)的，这意味着它一次性读完流中所有的数据
- * NIO是面向缓冲区(Buffer)的，基于Channel(通道)和Buffer(缓冲区)进行操作
+ * 传统IO是基于字节流和字符流进行操作。它是面向流(Stream)的，这意味着它必须一次性读完流中所有的数据
+ * NIO是基于Channel(通道)和Buffer(缓冲区)进行操作。它是面向缓冲区(Buffer)的，缓冲区中可以操作数据的选择性多一些，
+ * 比如可以读取一部分，同时接着写入一部分，可以通过移动指针来确定操作数据的大小
  * 
- * Buffer包含重要变量:
+ * Channel与Stream类似，不同点是Stream是单向的，Channel是双向的，也就是可读可写。
+ * 
+ * Buffer包含的主要变量元素:
  *   - capacity: 缓冲区数组的总长度
  *   - position: 下一个要操作的数据元素的位置
  *   - limit: 缓冲区数组中不可操作的下一个元素的位置(limit<=capacity)
  *   - mark: 用于记录当前position的前一个位置(Default: -1)
+ * 
+ * 例如通过ByteBuffer buffer = ByteBuffer.allocate(1024)这样可以创建一块长度为1024个字节的Buffer。
+ * 这时position的位置为0，表示可以从0开始读取或者写入数据，而limit/capacity的位置则为1023。
+ * 然后通过buffer.put(128)方法写入128个字节数据，这时position则到了128这个位置，
+ * 接下来调用buffer.flip()方法，position则又回到了0这个位置，而limit则标识到了128。
+ * 然后就可以使用channel.write(buffer)将buffer前边的(0-127)这些字节数据写入到channel中了。
+ *   
  */
 public class FileOperation {
 
 	public final static String FILE_PATH = System.getProperty("user.home") + "/test.txt";
 	
 	public static void main(String[] args) {
-		//writeFileByIO();
-		//readFileByIO();
+		File file = new File(FILE_PATH);
+		
+		System.out.println("file path: " + FILE_PATH);
+		System.out.println("----------IO----------");
+		writeFileByIO(file);
+		readFileByIO();
 		System.out.println("----------NIO----------");
-		writeFileByNIO();
+		writeFileByNIO(file);
 		readFileByNIO();
+		
+		//删除文件
+		if (file.exists()) {
+			file.delete();
+		}
 	}
 	
 	//使用OutputStream写入文件
-	public static void writeFileByIO() {
+	public static void writeFileByIO(File file) {
 		OutputStream output = null;
-		File file = new File(FILE_PATH);
 		try {
+			//文件存在则追加写入
 			output = new BufferedOutputStream(new FileOutputStream(file, file.exists()));
 			byte[] bytes = "传统IO写入\r\n".getBytes("utf-8");
 			output.write(bytes, 0, bytes.length);
 			output.flush();
-			System.out.println(FILE_PATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -87,11 +105,10 @@ public class FileOperation {
 	}
 
 	//使用FileChannel及ByteBuffer写入文件
-	public static void writeFileByNIO() {
+	public static void writeFileByNIO(File file) {
 		FileOutputStream output = null;
 		FileChannel channel = null;
 		try {
-			File file = new File(FILE_PATH);
 			output = new FileOutputStream(file, file.exists());
 			//从IO流中获取通道
 			channel = output.getChannel();
@@ -109,7 +126,6 @@ public class FileOperation {
 			//clear方法将缓冲区position设置为0，limit设置成capacity,
 			//这意味着清空缓冲区，下一次将从0开始写数据
 			buffer.clear();
-			System.out.println(FILE_PATH);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -142,7 +158,7 @@ public class FileOperation {
 			StringBuilder sb = new StringBuilder();
 			//从通道中读取数据并写入到缓冲区中
 			while((channel.read(buffer)) != -1) {
-				//开始读取
+				//确定读取范围
 				buffer.flip();
 				//处理中文问题
 				decoder.decode(buffer, charBuffer, false);

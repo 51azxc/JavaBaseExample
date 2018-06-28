@@ -1,4 +1,4 @@
-package com.example.db;
+package thirdparty.db;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;

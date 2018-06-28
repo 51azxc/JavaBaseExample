@@ -1,4 +1,4 @@
-package com.example.other;
+package thirdparty;
 
 import java.lang.reflect.Type;
 import java.util.Map;

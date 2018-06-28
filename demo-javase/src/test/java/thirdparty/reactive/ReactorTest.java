@@ -1,4 +1,4 @@
-package com.example.reactive;
+package thirdparty.reactive;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
