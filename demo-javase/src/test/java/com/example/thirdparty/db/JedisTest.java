@@ -1,4 +1,4 @@
-package thirdparty.db;
+package com.example.thirdparty.db;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

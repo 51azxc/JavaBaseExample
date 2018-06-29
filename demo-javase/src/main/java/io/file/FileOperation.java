@@ -106,12 +106,11 @@ public class FileOperation {
 
 	//使用FileChannel及ByteBuffer写入文件
 	public static void writeFileByNIO(File file) {
-		FileOutputStream output = null;
-		FileChannel channel = null;
-		try {
-			output = new FileOutputStream(file, file.exists());
-			//从IO流中获取通道
-			channel = output.getChannel();
+		//JDK7新特性: try-with-resources. I/O Stream 及Channel都实现了java.lang.AutoCloseable接口，
+		//如果使用try后的括号内初始化资源，那么在代码运行到try块之外就会自动调用close方法，而无需手动调用了
+		//从IO流中获取通道
+		try (FileOutputStream output = new FileOutputStream(file, file.exists());
+			 FileChannel channel = output.getChannel();) {
 			//分配空间
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 			byte[] bytes = "NIO写入\r\n".getBytes("utf-8");
@@ -128,30 +127,16 @@ public class FileOperation {
 			buffer.clear();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (channel != null) {
-					channel.close();
-				}
-				if (output != null) {
-					output.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 	
 	//使用FileChannel及ByteBuffer读取文件内容
 	public static void readFileByNIO() {
-		FileInputStream input = null;
-		FileChannel channel = null;
 		//解决中文乱码问题
 		Charset charset = Charset.forName("utf-8");  
         CharsetDecoder decoder = charset.newDecoder();  
-		try {
-			input = new FileInputStream(FILE_PATH);
-			channel = input.getChannel();
+		try (FileInputStream input = new FileInputStream(FILE_PATH);
+			 FileChannel channel = input.getChannel();) {
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 			//处理中文问题，没有可以不用写
 			CharBuffer charBuffer = CharBuffer.allocate(1024);
@@ -177,17 +162,6 @@ public class FileOperation {
 			System.out.println(sb.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (channel != null) {
-					channel.close();
-				}
-				if (input != null) {
-					input.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 }

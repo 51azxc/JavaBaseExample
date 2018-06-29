@@ -1,4 +1,4 @@
-package thirdparty;
+package com.example.thirdparty;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -1,15 +1,12 @@
-package thirdparty.reactive;
+package com.example.thirdparty.reactive;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.Test;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.TestPublisher;
 
@@ -34,12 +31,10 @@ public class ReactorTest {
 		 .expectNext("even", "2", "4", "6", "12")
 		 .verifyComplete();
 		
-		StepVerifier.create(Flux.range(1, 10).window(5, 3)
+		StepVerifier.create(Flux.range(1, 10).window(3, 5)
 				.concatMap(g -> g.defaultIfEmpty(-1))
-		).expectNext(1, 2, 3, 4, 5)
-		 .expectNext(4, 5, 6, 7, 8)
-		 .expectNext(7, 8, 9, 10)
-		 .expectNext(10)
+		).expectNext(1, 2, 3)
+		 .expectNext(6, 7, 8)
 		 .verifyComplete();
 
 		StepVerifier.create(Flux.range(1, 10).buffer(5, 3))

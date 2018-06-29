@@ -1,4 +1,4 @@
-package thirdparty;
+package com.example.thirdparty;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,14 +30,14 @@ import reactor.core.scheduler.Schedulers;
 public class ReactorTest {
 
 	public static void main(String[] args) {
-		System.out.println("----------创建Flux----------");
-		createFlux();
-		System.out.println("----------创建Mono----------");
-		createMono();
-		System.out.println("----------操作Flux----------");
-		operateFlux();
-		System.out.println("----------消息处理----------");
-		handleMessage();
+//		System.out.println("----------创建Flux----------");
+//		createFlux();
+//		System.out.println("----------创建Mono----------");
+//		createMono();
+//		System.out.println("----------操作Flux----------");
+//		operateFlux();
+//		System.out.println("----------消息处理----------");
+//		handleMessage();
 	}
 
 	//创建Flux
@@ -120,9 +121,20 @@ public class ReactorTest {
 	//操作Flux
 	public static void operateFlux() {
 		System.out.println("----------buffer----------");
-		//buffer会将流中的元素收集到集合中，并把集合对象作为流中的新元素
-		//buffer()方法把流中10个数据元素分成3个数组
-		Flux.range(1, 10).buffer(3).subscribe(System.out::println);
+		//buffer会将流中的元素按最大长度参数分割收集到集合中，并把集合对象作为流中的新元素
+		//buffer()方法把流中10个数据元素分割成长度为3的数组
+		Flux.range(1, 10).buffer(3).subscribe(i -> System.out.print(i));
+		//[1, 2, 3][4, 5, 6][7, 8, 9][10]
+		System.out.println();
+		//接收的第二个参数是skip为需要跳过的流中元素，如果相等则跟上边效果一样；
+		//如果小于分割长度则会将位于流中两者之差的长度将元素数放到下一个数组中
+		Flux.range(1, 10).buffer(3, 2).subscribe(i -> System.out.print(i));
+		//[1, 2, 3][3, 4, 5][5, 6, 7][7, 8, 9][9, 10]
+		System.out.println();
+		//如果大于分割长度则将位于流中两者之差的元素丢弃
+		Flux.range(1, 10).buffer(3, 4).subscribe(i -> System.out.print(i));
+		//[1, 2, 3][5, 6, 7][9, 10]
+		System.out.println();
 		
 		System.out.println("----------bufferUntil----------");
 		//bufferUntil会一直存放元素直到条件为true。这里就是每次碰到偶数就分割一个数组到流中
@@ -138,8 +150,8 @@ public class ReactorTest {
 		
 		System.out.println("----------window----------");
 		//window与buffer不同的是，window是将流中元素收集到另外的Flux序列中，返回的是Flux<Flux<T>>
-		//所以需要使用flatMap拍平它
-		Flux.range(1, 10).window(2).flatMap(s -> s).subscribe(System.out::println);
+		//与buffer相同的是，他也支持传入skip参数
+		Flux.range(1, 10).window(2).concatMap(s -> s.defaultIfEmpty(-1)).subscribe(System.out::println);
 		
 		System.out.println("----------zipWith----------");
 		//zipWith是将两个流中的元素合并成一个元素为元组的流。可以加入一个函数对合并的元素进行处理
@@ -259,6 +271,7 @@ public class ReactorTest {
 		.toStream()
 		.forEach(System.out::println);
 		
+		//并行处理
 		Flux.range(1, 10).parallel(2)
 			.subscribe(i -> 
 				System.out.println(Thread.currentThread().getName() + " -> " + i));
@@ -267,6 +280,21 @@ public class ReactorTest {
 			.runOn(Schedulers.parallel())
 			.subscribe(i -> 
 				System.out.println(Thread.currentThread().getName() + " -> " + i));
+		
+		System.out.println("----------热序列----------");
+		//热序列，只能获取到订阅后的元素
+		//publish()方法把一个Flux对象转换成 ConnectableFlux对象
+		//autoConnect()方法是当 ConnectableFlux对象有一个订阅者时就开始产生消息
+		final Flux<Long> source = Flux.interval(Duration.ofSeconds(1)).take(10).publish().autoConnect();
+		//订阅该 ConnectableFlux对象，让其开始产生数据
+		source.subscribe();
+		try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		//当前线程睡眠5秒钟后，此订阅者此时只能获得到该序列中的后5个元素，所输出的是数字 5 到 9
+		source.toStream().forEach(System.out::println);
 	}
 	
 }
