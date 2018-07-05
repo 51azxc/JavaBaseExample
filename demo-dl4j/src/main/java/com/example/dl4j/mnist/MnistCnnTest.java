@@ -1,4 +1,4 @@
-package com.example.dl4j;
+package com.example.dl4j.mnist;
 
 import java.io.IOException;
 
@@ -34,6 +34,7 @@ public class MnistCnnTest {
         int seed = 123;
 
         log.info("Load data....");
+        //直接下载mnist数据并分成训练/测试数据
         DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, 12345);
         DataSetIterator mnistTest = new MnistDataSetIterator(batchSize, false, 12345);
 
