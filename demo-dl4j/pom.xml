@@ -22,6 +22,25 @@
       <artifactId>deeplearning4j-core</artifactId>
       <version>1.0.0-beta</version>
     </dependency>
+    
+    <!-- DL4J Arbiter -->
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>arbiter-core</artifactId>
+      <version>1.0.0-beta</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>arbiter-deeplearning4j</artifactId>
+      <version>1.0.0-beta</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.deeplearning4j</groupId>
+      <artifactId>deeplearning4j-parallel-wrapper_2.11</artifactId>
+      <version>1.0.0-beta</version>
+    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
