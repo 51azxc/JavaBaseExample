@@ -13,14 +13,19 @@ import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.deeplearning4j.parallelism.ParallelWrapper;
 
-public class ParallelTrainingTest1 {
+public class CNNExample {
 
 	public static void main(String[] args) throws Exception {
+		int outputNum = 10;
+		int batchSize = 64;
+		int seed = 123;
+
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-			    .seed(123)
+			    .seed(seed)
 			    .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 			    .list()
 			    .layer(0, new ConvolutionLayer.Builder(5, 5)
@@ -43,29 +48,33 @@ public class ParallelTrainingTest1 {
 			        .stride(2,2)
 			        .build())
 			    .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
+			        .nIn(800)
 			        .nOut(500).build())
 			    .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 			        .nIn(500)
-			        .nOut(10)
+			        .nOut(outputNum)
 			        .activation(Activation.SOFTMAX)
 			        .build())
 			    .setInputType(InputType.convolutionalFlat(28,28,1)) 
 				.backprop(true).pretrain(false).build();
 		
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
-		model.init();
 		
-		ParallelWrapper wrapper = new ParallelWrapper.Builder<MultiLayerNetwork>(model)
-				.prefetchBuffer(24)
-	            .workers(2)
-	            .averagingFrequency(3)
-	            .reportScoreAfterAveraging(true)
-				.build();
+		int rngSeed = 12345;
+		//直接下载mnist数据并分成训练/测试数据
+		DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, rngSeed);
+		DataSetIterator mnistTest = new MnistDataSetIterator(batchSize, false, rngSeed);
 		
-		DataSetIterator mnistTrain = new MnistDataSetIterator(128, true, 12345);
-		DataSetIterator mnistTest = new MnistDataSetIterator(128, false, 12345);
+		DataNormalization scaler = new ImagePreProcessingScaler(0,1);
+		scaler.fit(mnistTrain);
+		mnistTrain.setPreProcessor(scaler);
+		mnistTest.setPreProcessor(scaler);
 		
-		wrapper.fit(mnistTrain);
+		for (int i = 1; i < 5; i++) {
+			model.fit(mnistTrain);
+			System.out.println("Epoch " + i + " complete");
+		}
+		
 		Evaluation eval = model.evaluate(mnistTest);
 		System.out.println(eval.stats());
 		

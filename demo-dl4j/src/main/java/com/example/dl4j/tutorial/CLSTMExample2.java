@@ -10,10 +10,12 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.example.dl4j.utilities.DataUtilities;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
+import org.datavec.api.records.reader.SequenceRecordReader;
 import org.datavec.api.records.reader.impl.csv.CSVSequenceRecordReader;
 import org.datavec.api.split.NumberedFileInputSplit;
 import org.deeplearning4j.datasets.datavec.SequenceRecordReaderDataSetIterator;
@@ -41,84 +43,58 @@ import org.nd4j.linalg.learning.config.AdaGrad;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class CLSTMTest2 {
+public class CLSTMExample2 {
 
 	public static void main(String[] args) throws Exception {
 		// 下载数据
 		String DATA_URL = "https://bpstore1.blob.core.windows.net/seatemp/sea_temp2.tar.gz";
-		Path DATA_PATH = Paths.get(System.getProperty("java.io.tmpdir"), "dl4j_seas");
+        String DATA_PATH = Paths.get(System.getProperty("java.io.tmpdir"), "dl4j_seas2").toString();
+        String localFilePath = Paths.get(DATA_PATH, "sea_temp.tar.gz").toString();
+        if (DataUtilities.downloadFile(DATA_URL, localFilePath)) {
+            System.out.println("download file from: " + DATA_URL);
+        }
 
-		if (Files.notExists(DATA_PATH, LinkOption.NOFOLLOW_LINKS)) {
-			Files.createDirectory(DATA_PATH);
-		}
-
-		Path archizePath = Paths.get(DATA_PATH.toString(), "sea_temp2.tar.gz");
-		FileUtils.copyURLToFile(new URL(DATA_URL), archizePath.toFile());
-
-		int fileCount = 0;
-		int BUFFER_SIZE = 4096;
-
-		try (TarArchiveInputStream tais = new TarArchiveInputStream(
-				new GzipCompressorInputStream(new BufferedInputStream(new FileInputStream(archizePath.toString()))))) {
-			TarArchiveEntry entry;
-			while ((entry = (TarArchiveEntry) tais.getNextEntry()) != null) {
-				Path entryPath = Paths.get(DATA_PATH.toString(), entry.getName());
-				if (entry.isDirectory()) {
-					Files.createDirectory(entryPath);
-					fileCount = 0;
-				} else {
-					int count;
-					byte[] bytes = new byte[4 * BUFFER_SIZE];
-					FileOutputStream fos = new FileOutputStream(entryPath.toFile());
-					BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
-					while ((count = tais.read(bytes, 0, BUFFER_SIZE)) != -1) {
-						dest.write(bytes, 0, count);
-					}
-					dest.close();
-					fileCount += 1;
-				}
-				if (fileCount % 1000 == 0) {
-					System.out.println(".");
-				}
-			}
-		}
+        Path dataPath = Paths.get(DATA_PATH, "sea_temp");
+        if (Files.notExists(dataPath, LinkOption.NOFOLLOW_LINKS)) {
+            DataUtilities.extractTarGz(localFilePath, DATA_PATH);
+        }
 
 		// 配置数据集
-		Path featureBaseDir = Paths.get(DATA_PATH.toString(), "sea_temp", "features");
-		Path targetsBaseDir = Paths.get(DATA_PATH.toString(), "sea_temp", "targets");
-		Path futureBaseDir = Paths.get(DATA_PATH.toString(), "sea_temp", "futures");
+        String featureBaseDir = Paths.get(dataPath.toString(), "features").toString();
+        String targetsBaseDir = Paths.get(dataPath.toString(), "targets").toString();
+        String futureBaseDir = Paths.get(dataPath.toString(), "futures").toString();
 		
 		int numSkipLines = 1;
 		boolean regression = true;
 		int batchSize = 32;
 
 		// 训练数据
-		CSVSequenceRecordReader trainFeatures = new CSVSequenceRecordReader(numSkipLines, ", ");
+		CSVSequenceRecordReader trainFeatures = new CSVSequenceRecordReader(numSkipLines);
 		trainFeatures.initialize(
-				new NumberedFileInputSplit(featureBaseDir.toAbsolutePath().toString() + "/%d.csv", 1, 1600));
-		CSVSequenceRecordReader trainTargets = new CSVSequenceRecordReader(numSkipLines, ",");
+				new NumberedFileInputSplit(featureBaseDir + "/%d.csv", 1, 1600));
+		CSVSequenceRecordReader trainTargets = new CSVSequenceRecordReader(numSkipLines);
 		trainTargets.initialize(
-				new NumberedFileInputSplit(targetsBaseDir.toAbsolutePath().toString() + "/%d.csv", 1, 1600));
-		DataSetIterator trainIter = new SequenceRecordReaderDataSetIterator(trainFeatures, trainTargets, batchSize, 10,
+				new NumberedFileInputSplit(targetsBaseDir + "/%d.csv", 1, 1600));
+		DataSetIterator train = new SequenceRecordReaderDataSetIterator(trainFeatures, trainTargets, batchSize, 10,
 				regression, SequenceRecordReaderDataSetIterator.AlignmentMode.EQUAL_LENGTH);
 
 		// 测试数据
-		CSVSequenceRecordReader testFeatures = new CSVSequenceRecordReader(numSkipLines, ", ");
+        SequenceRecordReader testFeatures = new CSVSequenceRecordReader(numSkipLines);
 		testFeatures.initialize(
-				new NumberedFileInputSplit(featureBaseDir.toAbsolutePath().toString() + "/%d.csv", 1601, 1736));
-		CSVSequenceRecordReader testTargets = new CSVSequenceRecordReader(numSkipLines, ",");
+				new NumberedFileInputSplit(featureBaseDir + "/%d.csv", 1601, 1736));
+        SequenceRecordReader testTargets = new CSVSequenceRecordReader(numSkipLines);
 		testTargets.initialize(
-				new NumberedFileInputSplit(targetsBaseDir.toAbsolutePath().toString() + "/%d.csv", 1601, 1736));
-		DataSetIterator testIter = new SequenceRecordReaderDataSetIterator(testFeatures, testTargets, batchSize, 10,
+				new NumberedFileInputSplit(targetsBaseDir + "/%d.csv", 1601, 1736));
+		DataSetIterator test = new SequenceRecordReaderDataSetIterator(testFeatures, testTargets, batchSize, 10,
 				regression, SequenceRecordReaderDataSetIterator.AlignmentMode.EQUAL_LENGTH);
-		
-		CSVSequenceRecordReader futureFeatures = new CSVSequenceRecordReader(numSkipLines, ", ");
+
+        SequenceRecordReader futureFeatures = new CSVSequenceRecordReader(numSkipLines);
 		futureFeatures.initialize(
-				new NumberedFileInputSplit(futureBaseDir.toAbsolutePath().toString() + "/%d.csv", 1601, 1736));
-		CSVSequenceRecordReader futureLabels = new CSVSequenceRecordReader(numSkipLines, ",");
+				new NumberedFileInputSplit(futureBaseDir + "/%d.csv", 1601, 1736));
+        SequenceRecordReader futureLabels = new CSVSequenceRecordReader(numSkipLines);
 		futureLabels.initialize(
-				new NumberedFileInputSplit(futureBaseDir.toAbsolutePath().toString() + "/%d.csv", 1601, 1736));
-		DataSetIterator futureIter = new SequenceRecordReaderDataSetIterator(futureFeatures, futureLabels, batchSize, 10,
+				new NumberedFileInputSplit(futureBaseDir + "/%d.csv", 1601, 1736));
+		DataSetIterator future = new SequenceRecordReaderDataSetIterator(futureFeatures, futureLabels, batchSize, 10,
 				regression, SequenceRecordReaderDataSetIterator.AlignmentMode.EQUAL_LENGTH);
 
 		// 配置神经网络
@@ -155,19 +131,19 @@ public class CLSTMTest2 {
 				    .build();
 
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
-		model.setListeners(new ScoreIterationListener(20));
+		model.init();
 
-		for (int i = 1; i <= 25; i++) {
+		for (int i = 1; i <= 15; i++) {
 			System.out.println("Epoch " + i);
-			model.fit(trainIter);
-			trainIter.reset();
+			model.fit(train);
+			train.reset();
 		}
 
 		RegressionEvaluation eval = new RegressionEvaluation();
-		testIter.reset();
-		futureIter.reset();
-		while(testIter.hasNext()) {
-			DataSet next = testIter.next();
+		test.reset();
+		future.reset();
+		while(test.hasNext()) {
+			DataSet next = test.next();
 			INDArray features = next.getFeatures();
 			INDArray pred = Nd4j.zeros(1, 2);
 			
@@ -175,7 +151,7 @@ public class CLSTMTest2 {
 				pred = model.rnnTimeStep(features.get(NDArrayIndex.all(), NDArrayIndex.all(), NDArrayIndex.interval(i,i+1)));
 			}
 			
-			DataSet correct = futureIter.next();
+			DataSet correct = future.next();
 			INDArray cFeatures = correct.getFeatures();
 			
 			for (int i = 0; i <= 9; i++) {

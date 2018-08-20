@@ -26,7 +26,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class EarlyStoppingTest1 {
+public class EarlyStoppingExample {
 	public static void main(String[] args) throws Exception {
 		int numRows = 28;
 		int numColumns = 28;

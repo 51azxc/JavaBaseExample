@@ -19,7 +19,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.AdaGrad;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class FeedForwardNeworkTest1 {
+public class FeedForwardNeworkExample {
 
 	public static void main(String[] args) throws IOException {
 		//确定每一层的输入值需要等于上一层的输出值

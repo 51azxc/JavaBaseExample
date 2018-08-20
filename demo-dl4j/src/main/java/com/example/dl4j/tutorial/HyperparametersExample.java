@@ -37,7 +37,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class HyperparametersTest1 {
+public class HyperparametersExample {
 
 	public static void main(String[] args) throws Exception {
 		

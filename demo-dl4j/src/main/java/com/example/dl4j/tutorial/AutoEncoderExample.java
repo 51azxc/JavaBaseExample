@@ -34,7 +34,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.AdaGrad;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class AutoEncoderTest1 {
+public class AutoEncoderExample {
 
 	public static void main(String[] args) throws IOException {
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()

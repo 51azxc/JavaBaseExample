@@ -5,10 +5,7 @@ import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.GravesLSTM;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
+import org.deeplearning4j.nn.conf.layers.*;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -16,7 +13,7 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-public class MultiLayerNetworkTest1 {
+public class MultiLayerNetworkExample {
 
 	public static void main(String[] args) {
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -78,7 +75,7 @@ public class MultiLayerNetworkTest1 {
 		ComputationGraphConfiguration cgConf1 = new NeuralNetConfiguration.Builder()
 				.graphBuilder()
 				.addInputs("input")
-		        .addLayer("L1", new GravesLSTM.Builder().nIn(5).nOut(5).build(), "input")
+		        .addLayer("L1", new LSTM.Builder().nIn(5).nOut(5).build(), "input")
 		        .addLayer("L2",new RnnOutputLayer.Builder().nIn(5+5).nOut(5).build(), "input", "L1")
 		        .setOutputs("L2")
 				.build();

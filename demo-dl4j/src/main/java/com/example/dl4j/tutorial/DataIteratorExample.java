@@ -17,7 +17,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
-public class DataIteratorTest1 {
+public class DataIteratorExample {
 	public static void main(String[] args) throws IOException {
 		//图片高度及宽度
 		int numRows = 28;

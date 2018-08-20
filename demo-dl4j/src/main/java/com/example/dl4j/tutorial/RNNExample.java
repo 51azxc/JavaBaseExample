@@ -20,7 +20,7 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.layers.GravesLSTM;
+import org.deeplearning4j.nn.conf.layers.LSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -31,7 +31,7 @@ import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 
-public class RNNTest1 {
+public class RNNExample {
 
 	public static void main(String[] args) throws Exception {
 		Path dataPath = Paths.get(System.getProperty("java.io.tmpdir"), "uci_synthetic_control");
@@ -90,7 +90,7 @@ public class RNNTest1 {
 				.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
 				.gradientNormalizationThreshold(0.5)
 				.list()
-				.layer(0, new GravesLSTM.Builder().activation(Activation.TANH)
+				.layer(0, new LSTM.Builder().activation(Activation.TANH)
 						.nIn(1).nOut(10).build())
 				.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
 						.activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build())
