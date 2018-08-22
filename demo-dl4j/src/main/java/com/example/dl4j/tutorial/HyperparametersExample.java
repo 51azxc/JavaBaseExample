@@ -1,10 +1,12 @@
 package com.example.dl4j.tutorial;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.deeplearning4j.arbiter.MultiLayerSpace;
@@ -15,7 +17,7 @@ import org.deeplearning4j.arbiter.layers.OutputLayerSpace;
 import org.deeplearning4j.arbiter.optimize.api.CandidateGenerator;
 import org.deeplearning4j.arbiter.optimize.api.OptimizationResult;
 import org.deeplearning4j.arbiter.optimize.api.ParameterSpace;
-import org.deeplearning4j.arbiter.optimize.api.data.DataProvider;
+import org.deeplearning4j.arbiter.optimize.api.data.DataSource;
 import org.deeplearning4j.arbiter.optimize.api.saving.ResultReference;
 import org.deeplearning4j.arbiter.optimize.api.saving.ResultSaver;
 import org.deeplearning4j.arbiter.optimize.api.score.ScoreFunction;
@@ -31,11 +33,14 @@ import org.deeplearning4j.arbiter.optimize.runner.LocalOptimizationRunner;
 import org.deeplearning4j.arbiter.saver.local.FileModelSaver;
 import org.deeplearning4j.arbiter.scoring.impl.EvaluationScoreFunction;
 import org.deeplearning4j.arbiter.task.MultiLayerNetworkTaskCreator;
+import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation.Metric;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
+
 
 public class HyperparametersExample {
 
@@ -61,11 +66,12 @@ public class HyperparametersExample {
 		//通过随机查找方式来确定潜在候选配置
 		CandidateGenerator candidateGenerator = new RandomSearchGenerator(hyperparameterSpace, null);
 		
-		//调用MNIST数据为数据提供者
-		int nTrainEpochs = 2;
-		int batchSize = 64;
-		DataProvider dataProvider = new MnistDataProvider(nTrainEpochs, batchSize);
-		
+		//自定义一个类调用Mnist数据迭代器作为数据源
+        Class<? extends DataSource> dataSource = MnistDataSource.class;
+        Properties properties = new Properties();
+        //指定批次数
+		properties.setProperty("batchSize", "64");
+
 		//通过判定分类的准确率来决定分数
 		ScoreFunction scoreFunction = new EvaluationScoreFunction(Metric.ACCURACY);
 		
@@ -86,7 +92,7 @@ public class HyperparametersExample {
 		//生成优化配置
 		OptimizationConfiguration configuration = new OptimizationConfiguration.Builder()
                 .candidateGenerator(candidateGenerator)
-                .dataProvider(dataProvider)
+                .dataSource(dataSource, properties)
                 .modelSaver(modelSaver)
                 .scoreFunction(scoreFunction)
                 .terminationConditions(terminationConditions)
@@ -110,5 +116,48 @@ public class HyperparametersExample {
         System.out.println("\n\nConfiguration of best model:\n");
         System.out.println(bestModel.getLayerWiseConfigurations().toJson());
 	}
+
+	public static class MnistDataSource implements DataSource {
+	    // 一次取出的数据数
+	    private int batchSize;
+	    private int rngSeed = 12345;
+
+	    public MnistDataSource() { }
+
+        @Override
+        public void configure(Properties properties) {
+            this.batchSize = Integer.parseInt(properties.getProperty("batchSize", "64"));
+        }
+
+        @Override
+        public Object trainData() {
+            DataSetIterator trainIter = null;
+            try {
+                //调用MnistDataSetIterator获取训练数据
+                trainIter = new MnistDataSetIterator(batchSize, true, rngSeed);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return trainIter;
+        }
+
+        @Override
+        public Object testData() {
+            DataSetIterator testIter = null;
+            try {
+                //调用MnistDataSetIterator获取测试数据
+                testIter = new MnistDataSetIterator(batchSize, false, rngSeed);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return testIter;
+        }
+
+        @Override
+        public Class<?> getDataType() {
+	        //指定数据类型
+            return DataSetIterator.class;
+        }
+    }
 
 }

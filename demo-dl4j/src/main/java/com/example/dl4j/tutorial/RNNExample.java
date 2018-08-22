@@ -91,15 +91,18 @@ public class RNNExample {
 				.gradientNormalizationThreshold(0.5)
 				.list()
 				.layer(0, new LSTM.Builder().activation(Activation.TANH)
-						.nIn(1).nOut(10).build())
+						.nIn(1).nOut(60).build())
 				.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-						.activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build())
+						.activation(Activation.SOFTMAX).nIn(60).nOut(numLabelClasses).build())
 				.pretrain(false).backprop(true).build();
 		
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
 		model.setListeners(new ScoreIterationListener(20));
-		
-		model.fit(trainIter);
+
+		for (int i = 0; i < 60; i++) {
+            model.fit(trainIter);
+		}
+
 		
 		Evaluation evaluation = model.evaluate(testIter);
 		
