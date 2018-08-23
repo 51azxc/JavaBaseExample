@@ -70,7 +70,7 @@ public class CNNExample {
 		mnistTrain.setPreProcessor(scaler);
 		mnistTest.setPreProcessor(scaler);
 		
-		for (int i = 1; i < 5; i++) {
+		for (int i = 1; i <= 5; i++) {
 			model.fit(mnistTrain);
 			System.out.println("Epoch " + i + " complete");
 		}
