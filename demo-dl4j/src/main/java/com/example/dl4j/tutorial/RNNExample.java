@@ -50,15 +50,19 @@ public class RNNExample {
 			for (String line : lines) {
 				Integer count = new Integer(lineCount / 100);
 				String newLine = null;
+				//文件默认是以空格分割数据的，现在讲分隔符变成", "，然后列转行
 				newLine = line.replaceAll("\\s+", ", " + count.toString() + "\n");
+				//结尾追加分割符与标签值
 				newLine += ", " + count.toString();
 				linesList.add(newLine);
 				lineCount += 1;
 			}
-			
+
+			//将数据随机打乱，不然都是统一的数据无法测试
 			Collections.shuffle(linesList);
 			
 			for (String line : linesList) {
+				//将数据写入到csv文件中
 				Path outPath = Paths.get(dataPath.toString(), index + ".csv");
 				FileUtils.writeStringToFile(outPath.toFile(), line, Charset.defaultCharset());
 				index += 1;
@@ -73,19 +77,25 @@ public class RNNExample {
 		int numLabelClasses = 6;
 		
 		//训练数据
+		//指定分隔符为", "
 		CSVSequenceRecordReader trainRR = new CSVSequenceRecordReader(0, ", ");
-		trainRR.initialize(new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 0, 449));
+		//NumberedFileInputSplit可以通过占位符来读取一堆csv文件
+		trainRR.initialize(
+				new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 0, 449));
+		//指定标签索引为1
 		DataSetIterator trainIter = new SequenceRecordReaderDataSetIterator(trainRR, batchSize, numLabelClasses, 1);
 		
 		//测试数据
 		CSVSequenceRecordReader testRR = new CSVSequenceRecordReader(0, ", ");
-		testRR.initialize(new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 450, 599));
+		testRR.initialize(
+				new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 450, 599));
 		DataSetIterator testIter = new SequenceRecordReaderDataSetIterator(testRR, batchSize, numLabelClasses, 1);
 	
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 				.seed(123)
 				.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 				.weightInit(WeightInit.XAVIER)
+				//学习速率为0.005
 				.updater(new Nesterovs(0.005, 0.9))
 				.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
 				.gradientNormalizationThreshold(0.5)

@@ -5,11 +5,14 @@
 在深度学习中，自编码是一种“尝试”重构其输入的神经网络。它可以作为一种特征提取形式，然后可以不断的叠加以建立“深层”网络（参见[DeepBelief](https://deeplearning4j.org/deepbeliefnetwork.html)等网络）。而由自编码产生的特征可以被馈送到其他分类，聚类和异常检测的算法中。
 
 当原始输入数据具有高维度且无法轻松绘制时，自编码对数据可视化也很有用。通过降低维度，输出值可以压缩到二维或3维空间，以便更好地进行数据探索。
-![Data Denoising ](https://upload.wikimedia.org/wikipedia/commons/d/d8/TVD_1D_Example.png)
+
 数据去噪
 
-![Dimensionality Reduction](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Kernel_Machine.svg/512px-Kernel_Machine.svg.png)
+![Data Denoising ](https://upload.wikimedia.org/wikipedia/commons/d/d8/TVD_1D_Example.png)
+
 降维
+
+![Dimensionality Reduction](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Kernel_Machine.svg/512px-Kernel_Machine.svg.png)
 
 ### 自编码是怎么工作的？
 
@@ -49,7 +52,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 ### 堆叠式自动编码器
 
-以下自动编码器使用两个堆叠的密集层进行编码。MNIST数字被转换为长度为784的1D数组（MNIST图像为28x28像素，因此将它们转换需要的大小为784）。
+以下自动编码器使用两个堆叠的密集层进行编码。MNIST数字被转换为长度为784的一维数组（MNIST图像为28x28像素，因此将它们转换需要的大小为784）。
 784 → 250 → 10 → 250 → 784
 
 ```
