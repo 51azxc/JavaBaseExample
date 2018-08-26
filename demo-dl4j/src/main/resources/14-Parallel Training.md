@@ -1,9 +1,9 @@
-### ±³¾°½éÉÜ
+### èƒŒæ™¯ä»‹ç»
 
-ÑµÁ·Éñ¾­ÍøÂçÄ£ĞÍÊÇÒ»¼şÊ®·Ö°º¹óµÄÊÂÇé£¬ÒòÎªËû¶Ô´¦ÀíÆ÷¼ÆËãÄÜÁ¦ÒªÇóºÜ¸ß¡£Èç¹ûÄãµÄ¼ÆËã»úÓĞGPUµÄÓ²¼şÉèÊ©µÄ»°£¬¿ÉÒÔÑ¡ÔñÊ¹ÓÃ¶à¸öGPU²¢ĞĞÑµÁ·£¬ÕâÑù¿ÉÒÔ¼Ó¿ìÑµÁ·ËÙ¶È¡£ÔÚ±¾½Ì³ÌÖĞ£¬ÎÒÃÇÊ¹ÓÃ¶à¸öGPUÀ´²¢ĞĞµÄÑµÁ·Ç°À¡Éñ¾­ÍøÂç¡£
+è®­ç»ƒç¥ç»ç½‘ç»œæ¨¡å‹æ˜¯ä¸€ä»¶ååˆ†æ˜‚è´µçš„äº‹æƒ…ï¼Œå› ä¸ºä»–å¯¹å¤„ç†å™¨è®¡ç®—èƒ½åŠ›è¦æ±‚å¾ˆé«˜ã€‚å¦‚æœä½ çš„è®¡ç®—æœºæœ‰GPUçš„ç¡¬ä»¶è®¾æ–½çš„è¯ï¼Œå¯ä»¥é€‰æ‹©ä½¿ç”¨å¤šä¸ªGPUå¹¶è¡Œè®­ç»ƒï¼Œè¿™æ ·å¯ä»¥åŠ å¿«è®­ç»ƒé€Ÿåº¦ã€‚åœ¨æœ¬æ•™ç¨‹ä¸­ï¼Œæˆ‘ä»¬ä½¿ç”¨å¤šä¸ªGPUæ¥å¹¶è¡Œçš„è®­ç»ƒå‰é¦ˆç¥ç»ç½‘ç»œã€‚
 
-### ÒıÈëÀà
-Ê×ÏÈĞèÒªÒıÈëÈ«ĞÂµÄÒÀÀµ:
+### å¼•å…¥ç±»
+é¦–å…ˆéœ€è¦å¼•å…¥å…¨æ–°çš„ä¾èµ–:
 ```
 <dependency>
   <groupId>org.deeplearning4j</groupId>
@@ -11,7 +11,7 @@
   <version>1.0.0-beta2</version>
 </dependency>
 ```
-È»ºóÔÙÊÇÒıÈë±ØĞèµÄÀà:
+ç„¶åå†æ˜¯å¼•å…¥å¿…éœ€çš„ç±»:
 ```
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
@@ -30,12 +30,12 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.deeplearning4j.parallelism.ParallelWrapper;
 ```
 
-Ê×ÏÈ»¹ÊÇµÃÏÈÒıÈëĞèÒªÑµÁ·µÄÊı¾İ£º
+é¦–å…ˆè¿˜æ˜¯å¾—å…ˆå¼•å…¥éœ€è¦è®­ç»ƒçš„æ•°æ®ï¼š
 ```
 DataSetIterator mnistTrain = new MnistDataSetIterator(128, true, 12345);
 DataSetIterator mnistTest = new MnistDataSetIterator(128, false, 12345);
 ```
-½ÓÏÂÀ´£¬¾ÍÊÇÅäÖÃÒ»¸ö¾í»ıÉñ¾­ÍøÂçÁË:
+æ¥ä¸‹æ¥ï¼Œå°±æ˜¯é…ç½®ä¸€ä¸ªå·ç§¯ç¥ç»ç½‘ç»œäº†:
 ```
 MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	    .seed(123)
@@ -74,9 +74,9 @@ MultiLayerNetwork model = new MultiLayerNetwork(conf);
 model.init();
 ```
 
-½ÓÏÂÀ´¾ÍÊÇÊ¹ÓÃ`ParallelWrapper`À´ÅäÖÃ²¢ĞĞÑµÁ·µÄÏà¹Ø²Ù×÷¡£Ëü»áÈÃ²ÎÓëÑµÁ·µÄGPU¸ºÔØ¾ùºâ¡£
+æ¥ä¸‹æ¥å°±æ˜¯ä½¿ç”¨`ParallelWrapper`æ¥é…ç½®å¹¶è¡Œè®­ç»ƒçš„ç›¸å…³æ“ä½œã€‚å®ƒä¼šè®©å‚ä¸è®­ç»ƒçš„GPUè´Ÿè½½å‡è¡¡ã€‚
 
-Ö¸¶¨²ÎÓëÑµÁ·µÄ"¹¤ÈËÃÇ"(workers£¬¼´GPUÓ²¼ş£¬ÕâÀïÖ¸¶¨2£¬×îµÍÒªÇó)£¬È»ºóÖ¸¶¨Æ½¾ùµü´ú´ÎÊı(ÕâÀïÊÇ3),ÕâÑùÄ£ĞÍ»á±»¾ùºâµÄ·ÖÅä¸øÃ¿¸ö²ÎÓëÑµÁ·µÄÓ²¼şÉèÊ©£¬ËûÃÇ»á²»¶ÏµÄÑµÁ·Ä£ĞÍ£¬×îÖÕÊ¹µÃÄ£ĞÍµÃµ½³ä·ÖµÄÑµÁ·¡£
+æŒ‡å®šå‚ä¸è®­ç»ƒçš„"å·¥äººä»¬"(workersï¼Œå³GPUç¡¬ä»¶ï¼Œè¿™é‡ŒæŒ‡å®š2ï¼Œæœ€ä½è¦æ±‚)ï¼Œç„¶åæŒ‡å®šå¹³å‡è¿­ä»£æ¬¡æ•°(è¿™é‡Œæ˜¯3),è¿™æ ·æ¨¡å‹ä¼šè¢«å‡è¡¡çš„åˆ†é…ç»™æ¯ä¸ªå‚ä¸è®­ç»ƒçš„ç¡¬ä»¶è®¾æ–½ï¼Œä»–ä»¬ä¼šä¸æ–­çš„è®­ç»ƒæ¨¡å‹ï¼Œæœ€ç»ˆä½¿å¾—æ¨¡å‹å¾—åˆ°å……åˆ†çš„è®­ç»ƒã€‚
 
 ```
 ParallelWrapper wrapper = new ParallelWrapper.Builder<MultiLayerNetwork>(model)
@@ -86,7 +86,7 @@ ParallelWrapper wrapper = new ParallelWrapper.Builder<MultiLayerNetwork>(model)
     .reportScoreAfterAveraging(true)
 	.build();
 ```
-×îºóÖ±½Óµ÷ÓÃ`fit`·½·¨¾Í¿ÉÒÔ²¢ĞĞÑµÁ·ÁË¡£
+æœ€åç›´æ¥è°ƒç”¨`fit`æ–¹æ³•å°±å¯ä»¥å¹¶è¡Œè®­ç»ƒäº†ã€‚
 ```
 wrapper.fit(mnistTrain);
 ```
