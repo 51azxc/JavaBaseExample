@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +28,8 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
+import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
@@ -59,7 +62,7 @@ public class RNNExample {
 			}
 
 			//将数据随机打乱，不然都是统一的数据无法测试
-			Collections.shuffle(linesList);
+			Collections.shuffle(linesList, new Random(12345));
 			
 			for (String line : linesList) {
 				//将数据写入到csv文件中
@@ -84,12 +87,20 @@ public class RNNExample {
 				new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 0, 449));
 		//指定标签索引为1
 		DataSetIterator trainIter = new SequenceRecordReaderDataSetIterator(trainRR, batchSize, numLabelClasses, 1);
-		
+
+		DataNormalization normalizer = new NormalizerStandardize();
+		normalizer.fit(trainIter);
+        trainIter.reset();
+
+        trainIter.setPreProcessor(normalizer);
+
 		//测试数据
 		CSVSequenceRecordReader testRR = new CSVSequenceRecordReader(0, ", ");
 		testRR.initialize(
 				new NumberedFileInputSplit(dataPath.toAbsolutePath().toString() + "/%d.csv", 450, 599));
 		DataSetIterator testIter = new SequenceRecordReaderDataSetIterator(testRR, batchSize, numLabelClasses, 1);
+
+        testIter.setPreProcessor(normalizer);
 	
 		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 				.seed(123)
@@ -101,19 +112,18 @@ public class RNNExample {
 				.gradientNormalizationThreshold(0.5)
 				.list()
 				.layer(0, new LSTM.Builder().activation(Activation.TANH)
-						.nIn(1).nOut(600).build())
+						.nIn(1).nOut(60).build())
 				.layer(1, new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-						.activation(Activation.SOFTMAX).nIn(600).nOut(numLabelClasses).build())
+						.activation(Activation.SOFTMAX).nIn(60).nOut(numLabelClasses).build())
 				.pretrain(false).backprop(true).build();
 		
 		MultiLayerNetwork model = new MultiLayerNetwork(conf);
 		model.setListeners(new ScoreIterationListener(20));
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 40; i++) {
             model.fit(trainIter);
 		}
 
-		
 		Evaluation evaluation = model.evaluate(testIter);
 		
 		System.out.println("Accuracy: " + evaluation.accuracy());

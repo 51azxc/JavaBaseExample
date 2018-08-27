@@ -44,7 +44,7 @@ import com.example.dl4j.utilities.DataUtilities;
 public class MnistCnnClassifier {
 
 	private final static Logger log = LoggerFactory.getLogger(MnistCnnClassifier.class);
-	private final static String basePath = Paths.get(System.getProperty("java.io.tmpdir"), "mnist").toString();
+	private final static String basePath = Paths.get(System.getProperty("java.io.tmpdir"), "dl4j_mnist").toString();
 	private final static String dataUrl = "http://github.com/myleott/mnist_png/raw/master/mnist_png.tar.gz";
 	
 	public static void main(String[] args) throws Exception {

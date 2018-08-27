@@ -115,7 +115,7 @@ public class LSTMExample {
         ComputationGraph model = new ComputationGraph(conf);
         model.init();
 
-        DataSetPreProcessor proc = new LastStepPreProc();
+        //DataSetPreProcessor proc = new LastStepPreProc();
         for (int i = 1; i <= 10; i++) {
             model.fit(trainData);
             trainData.reset();

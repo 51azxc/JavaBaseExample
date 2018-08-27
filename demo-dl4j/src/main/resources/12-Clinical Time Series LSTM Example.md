@@ -196,7 +196,6 @@ model.init();
 
 为了训练神经网络，我们只需在`for`循环中调用`ComputationGraph`的`fit`方法。
 ```
-DataSetPreProcessor proc = new LastStepPreProc();
 for (int i = 1; i <= 2; i++) {
     model.fit(trainData);
     trainData.reset();
