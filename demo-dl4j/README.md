@@ -1,0 +1,1 @@
+基于[官网入门教程](https://deeplearning4j.org/docs/latest/deeplearning4j-quickstart)的部分文档翻译。
