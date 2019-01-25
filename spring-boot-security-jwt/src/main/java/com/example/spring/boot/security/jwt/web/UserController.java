@@ -10,6 +10,7 @@ import com.example.spring.boot.security.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,7 +58,7 @@ public class UserController {
         return ResponseEntity.ok(map);
     }
 
-    @RolesAllowed("ROLE_USER")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("me")
     public HttpEntity<?> getUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
