@@ -1,21 +1,15 @@
 package com.example.spring.boot.security.jwt;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import com.example.spring.boot.security.jwt.domain.RoleType;
-import com.example.spring.boot.security.jwt.domain.User;
 import com.example.spring.boot.security.jwt.dto.LoginRequest;
 import com.example.spring.boot.security.jwt.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,27 +38,7 @@ public class ControllerTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper mapper;
-    @Autowired UserService userService;
-/*
-    @Before
-    public void setUp() {
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setPassword("admin");
-        userService.saveUser(admin, Arrays.asList(RoleType.ROLE_ADMIN, RoleType.ROLE_USER));
 
-        User user = new User();
-        user.setUsername("user");
-        user.setPassword("user");
-        userService.saveUser(user, Arrays.asList(RoleType.ROLE_USER));
-    }
-
-    @Test
-    public void testAnonymous() throws Exception {
-        mvc.perform(get("/")).andExpect(status().isOk())
-                .andExpect(content().string("Hello World")).andDo(print());
-    }
-*/
     @Test
     public void testNoAuth() throws Exception {
         mvc.perform(get("/resource/user")).andExpect(status().isUnauthorized());
@@ -76,11 +52,12 @@ public class ControllerTest {
                 .andExpect(content().string("success"));
     }
 
-    @WithUserDetails(userDetailsServiceBeanName = "userService")
     @Test
     public void testLogin() throws Exception {
         LoginRequest loginRequest = new LoginRequest("user", "user");
         String json = mapper.writeValueAsString(loginRequest);
+        mvc.perform(post("/users/register").contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(content().string("success"));
         mvc.perform(post("/users/login").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(jsonPath("$.type", equalTo("Bearer")));
     }
@@ -97,7 +74,8 @@ public class ControllerTest {
     @Test
     public void testUserAccess() throws Exception {
         mvc.perform(get("/resource/admin")).andExpect(status().is5xxServerError());
-        mvc.perform(get("/users/me")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.username", is("user")));
+        mvc.perform(get("/resource/user")).andExpect(status().isOk())
+                .andExpect(content().string("Hello User user"));
     }
+
 }
