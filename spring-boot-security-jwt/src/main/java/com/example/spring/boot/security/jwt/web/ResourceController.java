@@ -1,5 +1,6 @@
 package com.example.spring.boot.security.jwt.web;
 
+import com.example.spring.boot.security.jwt.dto.UserPrincipal;
 import com.example.spring.boot.security.jwt.dto.WebSocketMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -10,7 +11,6 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -31,17 +31,17 @@ public class ResourceController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/resource/user")
     public HttpEntity<?> getUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)auth.getPrincipal();
-        return ResponseEntity.ok("Hello User " + userDetails.getUsername());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        return ResponseEntity.ok("Hello User " + user.getUsername());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/resource/admin")
     public HttpEntity<?> getAdminUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)auth.getPrincipal();
-        return ResponseEntity.ok("Hello Admin " + userDetails.getUsername());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        return ResponseEntity.ok("Hello Admin " + user.getUsername());
     }
 
     @MessageMapping("/hello")       //接收客户端消息
@@ -54,7 +54,6 @@ public class ResourceController {
             template.convertAndSendToUser(user.getName(), "/queue/hello/msg",
                     new WebSocketMessage(msg + " " + i));
         }
-
         return new WebSocketMessage("hello " + msg);
     }
 

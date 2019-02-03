@@ -1,10 +1,10 @@
 package com.example.spring.boot.security.jwt.config;
 
+import com.example.spring.boot.security.jwt.component.AuthenticationTokenFilter;
+import com.example.spring.boot.security.jwt.component.JwtAuthenticationEntryPoint;
 import com.example.spring.boot.security.jwt.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,9 +33,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean PasswordEncoder passwordEncoder() { return PasswordEncoderFactories.createDelegatingPasswordEncoder(); }
 
-    @Bean AuthenticationTokenFilter tokenFilter() { return new AuthenticationTokenFilter(); }
+    @Bean
+    AuthenticationTokenFilter tokenFilter() { return new AuthenticationTokenFilter(); }
 
-    @Bean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() { return new JwtAuthenticationEntryPoint(); }
+    @Bean
+    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() { return new JwtAuthenticationEntryPoint(); }
 
     @Bean AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -69,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().authorizeRequests()
                 .antMatchers("/h2-console/**", "/users/register", "/users/login").permitAll()
                 // 给静态页面及WebSocket连接路径开放访问权限
-                .antMatchers("/resources/**", "index.html", "/ws/**", "/").permitAll()
+                .antMatchers("/resources/**", "/stomp/**", "/ws/**", "/").permitAll()
                 .antMatchers("/favicon.ico","/**/*.jpg","/**/*.html","/**/*.css", "/**/*.js").permitAll()
                 .anyRequest().authenticated()
                 .and()

@@ -2,6 +2,7 @@ package com.example.spring.boot.security.jwt.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,12 +13,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)  //隐藏null值
 //JPA Auditing可以在数据有变化时自动插入创建/修改人与创建/修改时间
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Job {
 
-    @JsonIgnore
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -41,12 +42,21 @@ public class Job {
     private Date updateDate;
 
     @ApiModelProperty(hidden = true)
+    @JsonIgnore
     @CreatedBy
-    private String createBy;
+    @Column(updatable = false)
+    private Long createBy;
 
     @ApiModelProperty(hidden = true)
+    @JsonIgnore
     @LastModifiedBy
-    private String updateBy;
+    private Long updateBy;
+
+    @Transient
+    private String createByUserName;
+
+    @Transient
+    private String updateByUsername;
 
     //在数据插入或者修改之前的操作
     @PrePersist @PreUpdate void preOp() {
@@ -94,19 +104,35 @@ public class Job {
         this.updateDate = updateDate;
     }
 
-    public String getCreateBy() {
+    public Long getCreateBy() {
         return createBy;
     }
 
-    public void setCreateBy(String createBy) {
+    public void setCreateBy(Long createBy) {
         this.createBy = createBy;
     }
 
-    public String getUpdateBy() {
+    public Long getUpdateBy() {
         return updateBy;
     }
 
-    public void setUpdateBy(String updateBy) {
+    public void setUpdateBy(Long updateBy) {
         this.updateBy = updateBy;
+    }
+
+    public String getCreateByUserName() {
+        return createByUserName;
+    }
+
+    public void setCreateByUserName(String createByUserName) {
+        this.createByUserName = createByUserName;
+    }
+
+    public String getUpdateByUsername() {
+        return updateByUsername;
+    }
+
+    public void setUpdateByUsername(String updateByUsername) {
+        this.updateByUsername = updateByUsername;
     }
 }

@@ -3,9 +3,10 @@ package com.example.spring.boot.security.jwt.web;
 import com.example.spring.boot.security.jwt.domain.RoleType;
 import com.example.spring.boot.security.jwt.domain.User;
 import com.example.spring.boot.security.jwt.dto.LoginRequest;
+import com.example.spring.boot.security.jwt.dto.UserPrincipal;
 import com.example.spring.boot.security.jwt.exception.UserExistsException;
 import com.example.spring.boot.security.jwt.exception.UserNotFoundException;
-import com.example.spring.boot.security.jwt.service.JwtTokenProvider;
+import com.example.spring.boot.security.jwt.component.JwtTokenProvider;
 import com.example.spring.boot.security.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -15,7 +16,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -61,10 +61,10 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("me")
     public HttpEntity<?> getUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails)auth.getPrincipal();
-        User u = userService.getUser(userDetails.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User " + userDetails.getUsername() + " Not Found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+        User u = userService.getUser(user.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User " + user.getUsername() + " Not Found"));
         return ResponseEntity.ok(u);
     }
 

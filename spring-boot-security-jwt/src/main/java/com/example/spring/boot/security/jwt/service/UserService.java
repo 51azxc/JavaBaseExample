@@ -3,6 +3,7 @@ package com.example.spring.boot.security.jwt.service;
 import com.example.spring.boot.security.jwt.domain.Role;
 import com.example.spring.boot.security.jwt.domain.RoleType;
 import com.example.spring.boot.security.jwt.domain.User;
+import com.example.spring.boot.security.jwt.dto.UserPrincipal;
 import com.example.spring.boot.security.jwt.repository.RoleRepository;
 import com.example.spring.boot.security.jwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +30,27 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(s)
-                .orElseThrow(() -> new UsernameNotFoundException("Username is not exists "));
+        return getUserPrincipalByUsername(s)
+                .orElseThrow(() -> new UsernameNotFoundException("user " + s + " not found"));
+    }
+
+    public Optional<UserPrincipal> getUserPrincipalByUsername(String username) {
+        return userRepository.findByUsername(username).map(user -> getUserPrincipal(user));
+    }
+
+    public Optional<UserPrincipal> getUserPrincipalById(Long id) {
+        return userRepository.findById(id).map(user -> getUserPrincipal(user));
+    }
+
+    private UserPrincipal getUserPrincipal(User user) {
         //if user.fetch = eager
         //Set<Role> roles = user.getRoles();
         //if user.fetch = lazy
-        Set<Role> roles = roleRepository.findByUsers_username(s);
+        Set<Role> roles = roleRepository.findByUsers_username(user.getUsername());
         List<GrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRoleType().name()))
                 .collect(Collectors.toList());
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(), authorities);
+        return new UserPrincipal(user.getId(),user.getUsername(),user.getPassword(),authorities);
     }
 
     @Transactional
@@ -63,6 +74,10 @@ public class UserService implements UserDetailsService {
     @RolesAllowed("ROLE_ADMIN")
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Optional<String> getUsernameById(Long id) {
+        return userRepository.findUsernameById(id);
     }
 
 }

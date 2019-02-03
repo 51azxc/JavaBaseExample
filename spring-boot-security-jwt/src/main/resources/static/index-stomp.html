@@ -23,7 +23,7 @@
 
         function connect() {
             var token = $("#token").val();
-            var url = '/ws';
+            var url = '/stomp';
             //通过query token来连接
             //url = url + '?token=' + token;
             var socket = new SockJS(url);

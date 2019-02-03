@@ -1,6 +1,5 @@
-package com.example.spring.boot.security.jwt.config;
+package com.example.spring.boot.security.jwt.component;
 
-import com.example.spring.boot.security.jwt.service.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -21,10 +20,10 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest req = (ServletServerHttpRequest) request;
             //从query参数中获取token并解析
-            Optional<String> username = Optional.ofNullable(req.getServletRequest().getParameter("token"))
-                    .map(tokenProvider::decode);
-            if (username.isPresent()) {
-                attributes.put("username", username.get());
+            Optional<Long> userId = Optional.ofNullable(req.getServletRequest()
+                    .getParameter("token")).map(s -> tokenProvider.decode(s));
+            if (userId.isPresent()) {
+                attributes.put("userId", userId.get());
             } else {
                 return false;
             }

@@ -1,4 +1,4 @@
-package com.example.spring.boot.security.jwt.config;
+package com.example.spring.boot.security.jwt.component;
 
 import com.example.spring.boot.security.jwt.exception.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
