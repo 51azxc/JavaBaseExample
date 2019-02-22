@@ -2,6 +2,7 @@ package com.example.spring.boot.security.jwt.component;
 
 import com.example.spring.boot.security.jwt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -25,9 +26,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String authHeader = "Authorization";
         String authPrefix = "Bearer ";
-        Optional.ofNullable(request.getHeader(authHeader))
+        Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
                 .filter(s -> s.startsWith(authPrefix))
                 .flatMap(s -> {
                     String token = s.replace(authPrefix, "");

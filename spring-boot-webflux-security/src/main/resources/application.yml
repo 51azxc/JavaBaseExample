@@ -1,0 +1,44 @@
+server:
+  # 指定端口号
+  port: 8088
+
+spring:
+  datasource:
+    # 指定为内存数据库H2
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
+      # MySQL url
+      # jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf8\
+      # &useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false
+    driver-class-name: org.h2.Driver
+    #MySQL driver class name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      # 指定数据库更新方式
+      ddl-auto: update
+    show-sql: true
+    proerties:
+      hibernate:
+        jdbc:
+          # 指定时区规范
+          time_zone: UTC
+        # MySQL Hibernate 方言
+        # dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
+    org.springframework.security: WARN
+    org.springframework.web: ERROR
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+    # 日志文件输出样式
+    #file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{18} - %msg%n"
+  # 日志文件配置项
+  #file: logs.log
+  #  max-size: 5MB
+  #  max-history: 20
+

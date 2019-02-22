@@ -5,7 +5,6 @@ import com.example.spring.boot.security.jwt.exception.UnAuthenticationException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
