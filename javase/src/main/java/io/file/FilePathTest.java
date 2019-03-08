@@ -2,6 +2,7 @@ package io.file;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -22,13 +23,8 @@ import java.util.List;
  */
 public class FilePathTest {
 
-	public static void main(String[] args) {
-		
-		try {
-			filesExample();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public static void main(String[] args) throws Exception {
+        filesExample();
 		filesVisitor();
 		pathsExample();
 	}
@@ -36,7 +32,12 @@ public class FilePathTest {
 	//操作Files
 	public static void filesExample() throws IOException {
 		System.out.println("----------文件操作----------");
-		Path p1 = Paths.get(System.getProperty("user.home"), "test.txt");
+		//创建文件夹
+		Path p = Paths.get(System.getProperty("user.dir"), "test");
+        if (Files.notExists(p, LinkOption.NOFOLLOW_LINKS)) {
+            Files.createDirectories(p);
+        }
+		Path p1 = Paths.get(p.toString(), "test1.txt");
 		
 		writeFile(p1);
 		readFile(p1);
@@ -45,7 +46,7 @@ public class FilePathTest {
 		boolean isRegularExecutableFile = Files.isReadable(p1) 
 				&& Files.isWritable(p1) && Files.isExecutable(p1);
 		if (isRegularExecutableFile) {
-			Path p2 = Paths.get(System.getProperty("user.home"), "test1.txt");
+			Path p2 = Paths.get(p.toString(), "test2.txt");
 			//copy可以复制文件,复制文件夹不会复制文件夹里边的文件。选项有以下三个:
 			//COPY_ATTRIBUTES: 复制文件的相关属性，真正的完全复制
 			//REPLACE_EXISTING: 如果目标路径已存在，则覆盖掉。如果复制的是符号链接，只复制链接本身。
@@ -58,7 +59,7 @@ public class FilePathTest {
 			
 			//对应的也有move方法用于移动文件,参数多了一个:
 			//ATOMIC_MOVE：原子文件操作，即该操作不能被打断或者部分地执行，该操作被完全执行或者执行失败
-			Path p3 = Paths.get(System.getProperty("user.dir"), "test.txt");
+			Path p3 = Paths.get(p.toString(), "test3.txt");
 			Files.move(p2, p3, StandardCopyOption.REPLACE_EXISTING);
 			
 			//可以通过readAllLines逐行读取
@@ -67,7 +68,7 @@ public class FilePathTest {
 			list.stream().forEach(System.out::println);
 			
 			//删除文件
-			Files.delete(p3);
+			//Files.delete(p3);
 		}
 		
 		//读取文件属性
@@ -91,7 +92,11 @@ public class FilePathTest {
 		//Path->File可以使用path.toFile()方法
 		
 		//删除已存在的文件
-		Files.deleteIfExists(p1);
+		//Files.deleteIfExists(p1);
+
+        //Warning: 删除文件夹下的所有文件!!!
+        Files.walk(p1.getParent()).map(Path::toFile).peek(System.out::println).forEach(File::delete);
+        Files.delete(p);
 	}
 	
 	//使用newBufferedWriter写入数据
@@ -123,7 +128,7 @@ public class FilePathTest {
 	//文件夹遍历
 	public static void filesIterable() {
 		System.out.println("----------文件夹遍历----------");
-		Path p1 = Paths.get(System.getProperty("user.dir")); 
+		Path p1 = Paths.get(System.getProperty("user.dir"), "javase");
 		try(DirectoryStream<Path> stream = Files.newDirectoryStream(p1)) {
 			for (Path file : stream) {
 				System.out.println(file.getFileName());
@@ -158,7 +163,7 @@ public class FilePathTest {
 	
 	//通过FileVisitor接口遍历文件
 	public static void filesVisitor() {
-		Path p1 = Paths.get(System.getProperty("user.dir"));
+		Path p1 = Paths.get(System.getProperty("user.dir"), "javase");
 		try {
 			Files.walkFileTree(p1, new SimpleFiles()).forEach(path -> {
 				System.out.println(path.toString());
@@ -209,10 +214,9 @@ public class FilePathTest {
 	
 	// 操作Paths
 	public static void pathsExample() {
-		String currentDir = System.getProperty("user.dir");
 		//通过静态方法来创建,get方法可以接多个参数
-		Path p1 = Paths.get(currentDir);
-		Path p2 = Paths.get(currentDir, ".", "pom.xml");
+		Path p1 = Paths.get(System.getProperty("user.dir"), "javase");
+		Path p2 = Paths.get(p1.toString(), ".", "pom.xml");
 		
 		System.out.println("root: " + p2.getRoot() 
 			+ "\t parent: " + p2.getParent() 

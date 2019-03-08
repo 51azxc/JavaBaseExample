@@ -22,7 +22,8 @@ public class TokenSecurityContextRepository implements ServerSecurityContextRepo
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
-        throw new UnsupportedOperationException("No save method");
+        return Mono.defer(() -> Mono.error(new UnsupportedOperationException("No save method")));
+        //throw new UnsupportedOperationException("No save method");
     }
 
     @Override

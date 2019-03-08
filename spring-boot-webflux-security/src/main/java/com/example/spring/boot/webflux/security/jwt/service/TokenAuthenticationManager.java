@@ -28,15 +28,18 @@ public class TokenAuthenticationManager implements ReactiveAuthenticationManager
         if (authentication.isAuthenticated()) { return Mono.just(authentication); }
         return Mono.just(authentication)
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Bad Credentials")))
-                .cast(UsernamePasswordAuthenticationToken.class)
-                .flatMap(token -> authenticateUser(token))
+                //.cast(UsernamePasswordAuthenticationToken.class)
+                .map(authenticationToken -> authenticationToken.getPrincipal().toString())
+                //.filter(token -> SecurityContextHolder.getContext().getAuthentication() == null)
+                .flatMap(userService::findByUsername)
+                //.flatMap(token -> authenticateUser(token))
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
                 .filter(u -> passwordEncoder.matches(authentication.getCredentials().toString(), u.getPassword()))
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")))
                 .cast(User.class)
                 .map(u -> new UsernamePasswordAuthenticationToken(u.getId(), null, u.getAuthorities()));
     }
-
+/*
     private Mono<UserDetails> authenticateUser(Authentication authentication) {
         String username = authentication.getPrincipal().toString();
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -44,4 +47,5 @@ public class TokenAuthenticationManager implements ReactiveAuthenticationManager
         }
         return Mono.empty();
     }
+*/
 }
