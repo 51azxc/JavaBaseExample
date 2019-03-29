@@ -110,7 +110,7 @@ public class FileOperation {
 		//如果使用try后的括号内初始化资源，那么在代码运行到try块之外就会自动调用close方法，而无需手动调用了
 		//从IO流中获取通道
 		try (FileOutputStream output = new FileOutputStream(file, file.exists());
-			 FileChannel channel = output.getChannel();) {
+			 FileChannel channel = output.getChannel()) {
 			//分配空间
 			ByteBuffer buffer = ByteBuffer.allocate(1024);
 			byte[] bytes = "NIO写入\r\n".getBytes("utf-8");
