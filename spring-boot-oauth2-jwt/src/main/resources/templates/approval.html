@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>approval</title>
+    <link rel="stylesheet" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <style>
+         body {
+          padding-top: 40px;
+          padding-bottom: 40px;
+          background-color: #eee;
+        }
+        .form-approval {
+          max-width: 330px;
+          padding: 15px;
+          margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="form-approval" method="post" action="/oauth/authorize">
+        <h2>OAuth Approval</h2>
+        <p>Do you authorize this client to access your protected resources?</p>
+        <div class="radio">
+            <label class="checkbox-inline">
+                <input type="radio" name="scope.read" id="approval" value="true" checked>
+                Approval
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="scope.read" id="deny" value="false">
+                Deny
+            </label>
+        </div>
+        <input type="hidden" name="user_oauth_approval" value="true">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Authorize</button>
+    </form>
+</div>
+</body>
+</html>

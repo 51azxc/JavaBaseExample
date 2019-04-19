@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+# 设置资源服务过滤器的执行顺序
+security:
+  oauth2:
+    resource:
+      filter-order: 3

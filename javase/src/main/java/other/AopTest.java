@@ -11,7 +11,7 @@ import java.lang.reflect.Proxy;
 public class AopTest {
 
 	public static void main(String[] args) {
-		System.out.println("----------static proxy----------");
+		System.out.println("----------templates proxy----------");
 		staticProxyExample();
 		System.out.println("----------dynamic proxy----------");
 		dynamicProxyExample();
@@ -43,8 +43,8 @@ public class AopTest {
 		}
 		
 		Hello hello = new HelloProxy(new HelloImpl());
-		hello.sayHello("static");
-		hello.sayGoodBye("static");
+		hello.sayHello("templates");
+		hello.sayGoodBye("templates");
 	}
 	
 	public static void dynamicProxyExample() {

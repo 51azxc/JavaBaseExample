@@ -15,7 +15,7 @@ public class LoadOrderTest1 extends LoadOrderTest1SuperClass {
 	}
 	{ System.out.println("subclass code"); }
 	static {
-		System.out.println("subclass static code");
+		System.out.println("subclass templates code");
 	}
 	
 	public static void main(String[] args) {
@@ -30,6 +30,6 @@ class LoadOrderTest1SuperClass {
 	}
 	{ System.out.println("superclass code"); }
 	static {
-		System.out.println("superclass static code");
+		System.out.println("superclass templates code");
 	}
 }

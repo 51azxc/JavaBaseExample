@@ -1,0 +1,2 @@
+insert into oauth_client_details values('client1','api', '{bcrypt}$2a$10$lYg2CcuKxg2WUHY96r14vuu2YXnvJThgQ3g6nNKZjWzdXK0U7HrHu', 'read,write', 'client_credentials,password,refresh_token', 'http://localhost:8080/test', 'ROLE_USER', 36000, 360000, NULL, 'true');
+insert into oauth_client_details values('client2','api', '{bcrypt}$2a$10$lYg2CcuKxg2WUHY96r14vuu2YXnvJThgQ3g6nNKZjWzdXK0U7HrHu', 'read,write', 'authorization_code,refresh_token', 'http://localhost:8080/test', 'ROLE_USER', 36000, 360000, NULL, 'false');
