@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * CompletableFuture有很多种方法，其中分为不同的类型:
  * 
  * 创建方法有completedFuture/runAsync/supplyAsync
- * 转换方法有thanApply/thenApplyAsync
+ * 转换方法有thenApply/thenApplyAsync
  * 消费方法有thenAccept/thenAcceptAsync/thenAcceptBoth/thenAcceptBothAsync
  * 			/runAfterBoth/runAfterBothAsync
  * 组合方法有thenCompose/thenComposeAsync/thenCombine/thenCombineAsync
@@ -83,7 +83,7 @@ public class CompletableFutureTest {
 		System.out.println(future2.getNow(0));
 	}
 	
-	/* 使用runAsync()/suppleyAsync()方法异步创建CompletableFuture对象 */
+	/* 使用runAsync()/supplyAsync()方法异步创建CompletableFuture对象 */
 	public static void createCompletableFutureAsync() {
 		//run开头表明没有返回值(Void)的CompletableFuture对象
 		CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {

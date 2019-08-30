@@ -1,4 +1,4 @@
-package gof.singleton;
+package design.pattern.creational.singleton;
 
 //饿汉模式
 public class Eager {

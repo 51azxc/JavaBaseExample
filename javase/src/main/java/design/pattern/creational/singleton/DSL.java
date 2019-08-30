@@ -1,4 +1,4 @@
-package gof.singleton;
+package design.pattern.creational.singleton;
 
 //双检索模式
 public class DSL {

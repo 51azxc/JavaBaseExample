@@ -1,4 +1,4 @@
-package gof.singleton;
+package design.pattern.creational.singleton;
 
 public class Holder {
 	private Holder() {}
