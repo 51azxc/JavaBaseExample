@@ -42,4 +42,4 @@ logging:
   #file:
   #  max-size: 5MB
   #  max-history: 20
-logging.file: logs.log
+#logging.file: logs.log
