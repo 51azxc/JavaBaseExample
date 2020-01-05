@@ -13,10 +13,11 @@ spring:
     #MySQL driver class name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
+    schema: classpath:table.sql
   jpa:
-    hibernate:
-      # 指定数据库更新方式
-      ddl-auto: update
+    # 指定数据库更新方式
+    #hibernate:
+    #  ddl-auto: update
     show-sql: true
     proerties:
       hibernate:
@@ -38,7 +39,7 @@ logging:
     # 日志文件输出样式
     #file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{18} - %msg%n"
   # 日志文件配置项
-  #file: logs.log
+  #file:
   #  max-size: 5MB
   #  max-history: 20
-
+logging.file: logs.log
