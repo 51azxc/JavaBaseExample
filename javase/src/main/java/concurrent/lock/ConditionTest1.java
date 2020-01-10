@@ -24,46 +24,38 @@ public class ConditionTest1 {
 		
 		System.out.println("START");
 		ExecutorService service = Executors.newFixedThreadPool(2);
-		service.execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					lock.lock();
-					while (total <= 10) {
-						total ++;
-						System.out.print(0);
-						TimeUnit.MILLISECONDS.sleep(100);
-						conditionA.await();
-						conditionB.signal();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					lock.unlock();
-					latch.countDown();
+		service.execute(() -> {
+			try {
+				lock.lock();
+				while (total <= 10) {
+					total ++;
+					System.out.print(0);
+					TimeUnit.MILLISECONDS.sleep(100);
+					conditionA.await();
+					conditionB.signal();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+				latch.countDown();
 			}
 		});
-		service.execute(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					lock.lock();
-					while (total <= 10) {
-						total ++;
-						System.out.print(1);
-						TimeUnit.MILLISECONDS.sleep(100);
-						conditionA.signal();
-						conditionB.await();
-					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					lock.unlock();
-					latch.countDown();
+		service.execute(() -> {
+			try {
+				lock.lock();
+				while (total <= 10) {
+					total ++;
+					System.out.print(1);
+					TimeUnit.MILLISECONDS.sleep(100);
+					conditionA.signal();
+					conditionB.await();
 				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+				latch.countDown();
 			}
 		});
 		latch.await();
