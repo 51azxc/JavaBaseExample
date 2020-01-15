@@ -6,13 +6,20 @@ import com.example.spring.boot.webflux.security.jwt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -35,16 +42,15 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
-        return httpSecurity
-                .csrf().disable()
-                .logout().disable()
+        return httpSecurity.httpBasic().disable().formLogin().disable().csrf().disable().logout().disable()
                 .cors()
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler((exchange, e) -> Mono.error(e))
                 .and()
-                .authenticationManager(tokenAuthenticationManager())
-                .securityContextRepository(tokenSecurityContextRepository())
+                .addFilterAt(webFilter(),  SecurityWebFiltersOrder.AUTHORIZATION)
+                //.authenticationManager(tokenAuthenticationManager())
+                //.securityContextRepository(tokenSecurityContextRepository())
                 .authorizeExchange()
                 .pathMatchers("/login","/register","/favicon.ico").permitAll()
                 .pathMatchers(HttpMethod.GET, "/").permitAll()
@@ -73,5 +79,26 @@ public class WebSecurityConfig {
     @Bean
     public TokenSecurityContextRepository tokenSecurityContextRepository() {
         return new TokenSecurityContextRepository(tokenProvider, tokenAuthenticationManager());
+    }
+
+    @Bean
+    public TokenAuthenticationConverter tokenAuthenticationConverter() {
+        return new TokenAuthenticationConverter(tokenProvider);
+    }
+
+    @Bean
+    public AuthenticationWebFilter webFilter() {
+        class TokenHeaderExchangeMatcher implements ServerWebExchangeMatcher {
+            public Mono<ServerWebExchangeMatcher.MatchResult> matches(ServerWebExchange exchange) {
+                return Mono.justOrEmpty(exchange).map(ServerWebExchange::getRequest).map(ServerHttpRequest::getHeaders)
+                        .filter(h -> h.containsKey(HttpHeaders.AUTHORIZATION))
+                        .flatMap($ -> MatchResult.match()).switchIfEmpty(MatchResult.notMatch());
+            }
+        }
+        AuthenticationWebFilter webFilter = new AuthenticationWebFilter(tokenAuthenticationManager());
+        webFilter.setRequiresAuthenticationMatcher(new TokenHeaderExchangeMatcher());
+        webFilter.setServerAuthenticationConverter(tokenAuthenticationConverter());
+        webFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
+        return webFilter;
     }
 }
