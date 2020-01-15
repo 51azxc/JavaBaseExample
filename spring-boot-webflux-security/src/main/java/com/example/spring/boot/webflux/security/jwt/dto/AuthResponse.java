@@ -3,6 +3,8 @@ package com.example.spring.boot.webflux.security.jwt.dto;
 public class AuthResponse {
     private String token;
 
+    public AuthResponse() {}
+
     public AuthResponse(String token) {
         this.token = token;
     }

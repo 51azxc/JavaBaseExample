@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -54,9 +55,9 @@ public class WebSecurityConfig {
                 .authorizeExchange()
                 .pathMatchers("/login","/register","/favicon.ico").permitAll()
                 .pathMatchers(HttpMethod.GET, "/").permitAll()
-                .pathMatchers("/admin").hasRole("ADMIN")
-                .pathMatchers("/user").hasRole("USER")
-                .anyExchange().authenticated()
+                //.pathMatchers("/admin").hasRole("ADMIN")
+                //.pathMatchers("/user").hasRole("USER")
+                .anyExchange().access(tokenAuthorizationManager())//.authenticated()    //custom authorization manager
                 .and()
                 .build();
     }
@@ -100,5 +101,10 @@ public class WebSecurityConfig {
         webFilter.setServerAuthenticationConverter(tokenAuthenticationConverter());
         webFilter.setSecurityContextRepository(new WebSessionServerSecurityContextRepository());
         return webFilter;
+    }
+
+    @Bean
+    public ReactiveAuthorizationManager tokenAuthorizationManager() {
+        return new TokenAuthorizationManager();
     }
 }

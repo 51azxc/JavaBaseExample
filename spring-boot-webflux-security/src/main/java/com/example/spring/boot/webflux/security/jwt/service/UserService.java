@@ -1,6 +1,8 @@
 package com.example.spring.boot.webflux.security.jwt.service;
 
-import com.example.spring.boot.webflux.security.jwt.domain.*;
+import com.example.spring.boot.webflux.security.jwt.domain.Role;
+import com.example.spring.boot.webflux.security.jwt.domain.RoleType;
+import com.example.spring.boot.webflux.security.jwt.domain.User;
 import com.example.spring.boot.webflux.security.jwt.repository.RoleRepository;
 import com.example.spring.boot.webflux.security.jwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +43,15 @@ public class UserService implements ReactiveUserDetailsService {
     @Transactional
     public User saveUser(User user, List<String> roleTypes) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Role> roles = roleTypes.stream().map(RoleType::fromString)
-                .map(roleType -> roleRepository.findByRoleType(roleType).get())
-                .collect(Collectors.toSet());
-        user.setRoles(roles);
+        List<RoleType> roleTypeList = roleTypes.stream().map(RoleType::fromString).collect(Collectors.toList());
+        Set<Role> existRoles = roleRepository.findByRoleTypeIn(roleTypeList);
+        if (existRoles.size() != roleTypes.size()) {
+            Set<RoleType> existRoleTypes = existRoles.stream().map(Role::getRoleType).collect(Collectors.toSet());
+            List<Role> notExistRoles = roleTypeList.stream()
+                    .filter(r -> !existRoleTypes.contains(r)).map(Role::new).collect(Collectors.toList());
+            existRoles.addAll(roleRepository.saveAll(notExistRoles));
+        }
+        user.setRoles(existRoles);
         return userRepository.save(user);
     }
 
