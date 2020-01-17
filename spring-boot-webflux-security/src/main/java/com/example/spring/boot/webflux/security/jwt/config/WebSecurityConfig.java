@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -47,7 +48,8 @@ public class WebSecurityConfig {
                 .cors()
                 .and()
                 .exceptionHandling()
-                .accessDeniedHandler((exchange, e) -> Mono.error(e))
+                .authenticationEntryPoint((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED)))
+                .accessDeniedHandler((swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
                 .and()
                 .addFilterAt(webFilter(),  SecurityWebFiltersOrder.AUTHORIZATION)
                 //.authenticationManager(tokenAuthenticationManager())

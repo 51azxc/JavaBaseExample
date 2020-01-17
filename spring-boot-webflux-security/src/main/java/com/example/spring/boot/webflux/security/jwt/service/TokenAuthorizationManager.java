@@ -3,6 +3,7 @@ package com.example.spring.boot.webflux.security.jwt.service;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,8 @@ public class TokenAuthorizationManager implements ReactiveAuthorizationManager<A
         String path = uri.getPath().replaceAll("/","");
         final String role = "ROLE_" + path.toUpperCase();
         return mono.filter(Authentication::isAuthenticated)
-                .map(auth -> auth.getAuthorities().stream().filter(g -> g.getAuthority().equals(role)).count() > 0)
+                .map(Authentication::getAuthorities)
+                .map(l -> l.stream().anyMatch(g -> g.getAuthority().equals(role)))
             .defaultIfEmpty(false)
             .map(AuthorizationDecision::new);
     }
