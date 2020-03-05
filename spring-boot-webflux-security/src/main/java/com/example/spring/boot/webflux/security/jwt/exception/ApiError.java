@@ -9,11 +9,11 @@ import java.time.ZoneId;
 public class ApiError {
     private HttpStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime localDateTime;
+    private LocalDateTime dateTime;
     private String message;
 
     public ApiError() {
-        localDateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        dateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
     }
 
     public ApiError(HttpStatus status, String message) {
@@ -30,12 +30,12 @@ public class ApiError {
         this.status = status;
     }
 
-    public LocalDateTime getLocalDateTime() {
-        return localDateTime;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
-        this.localDateTime = localDateTime;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public String getMessage() {

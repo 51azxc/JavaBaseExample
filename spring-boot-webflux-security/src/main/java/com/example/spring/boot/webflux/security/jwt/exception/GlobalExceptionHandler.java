@@ -13,12 +13,16 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Component
 @Order(-2)  // Spring自带的WebHandler为-1
@@ -34,22 +38,30 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        logger.error(ex.getLocalizedMessage(), ex);
-
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpStatus status;
         String message;
         if (ex instanceof WebExchangeBindException) {
-            status = HttpStatus.UNPROCESSABLE_ENTITY;
+            status = HttpStatus.BAD_REQUEST;
             WebExchangeBindException e = (WebExchangeBindException) ex;
             StringBuilder sb = new StringBuilder();
-            e.getBindingResult().getFieldErrors().forEach(error ->
-                    sb.append(error.getField() + ": " + error.getDefaultMessage() + "\n"));
+            List<ObjectError> errors = e.getBindingResult().getAllErrors();
+            for (ObjectError error : errors) {
+                if (error instanceof FieldError) {
+                    FieldError fieldError = (FieldError)error;
+                    sb.append(fieldError.getField()).append(" - ")
+                            .append(fieldError.getDefaultMessage()).append("\r\n");
+                } else {
+                    sb.append(error.getDefaultMessage());
+                }
+            }
             message = sb.toString();
+            logger.warn("Validation failed: {}", message);
         } else if (ex instanceof ResponseStatusException) {
             ResponseStatusException e = (ResponseStatusException)ex;
             status = e.getStatus();
             message = e.getReason();
+            logger.warn("response exception, status: {}, reason: {}", status.value(), message);
         } else {
             message = ex.getLocalizedMessage();
             if (ex instanceof BadCredentialsException || ex instanceof AuthenticationException) {
@@ -62,6 +74,7 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
                 status = HttpStatus.FORBIDDEN;
             } else {
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
+                logger.warn(ex.getLocalizedMessage(), ex);
             }
         }
         exchange.getResponse().setStatusCode(status);

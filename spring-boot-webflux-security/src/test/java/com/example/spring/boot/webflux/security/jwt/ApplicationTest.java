@@ -5,6 +5,7 @@ import com.example.spring.boot.webflux.security.jwt.dto.AuthResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient(timeout = "600000")		//定义过期时间
 public class ApplicationTest {
 
     @Autowired WebTestClient webTestClient;
