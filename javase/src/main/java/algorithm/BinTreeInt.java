@@ -80,21 +80,21 @@ public class BinTreeInt {
 		System.out.println();
 		System.out.print("后序遍历: ");
 		binTree.postOrder(binTree.root);
-		
+	}
+
+	static class BinNode {
+		// 左节点
+		public BinNode leftChild;
+		// 右节点
+		public BinNode rightChild;
+		// 节点对应的值
+		public int data;
+
+		public BinNode(int data) {
+			this.leftChild = null;
+			this.rightChild = null;
+			this.data = data;
+		}
 	}
 }
 
-class BinNode {
-	// 左节点
-	public BinNode leftChild;
-	// 右节点
-	public BinNode rightChild;
-	// 节点对应的值
-	public int data;
-
-	public BinNode(int data) {
-		this.leftChild = null;
-		this.rightChild = null;
-		this.data = data;
-	}
-}

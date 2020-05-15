@@ -1,17 +1,20 @@
 package algorithm;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeMap;
+import javax.swing.tree.TreeNode;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public class LeetCodeTest {
 	public static void main(String[] args) {
-		System.out.println(titleToNumber("AA"));
+		int[] nums = new int[] { -1, -1, 1 };
+		System.out.println(subarraySum(nums, 0));
 	}
 
+	/*
+	 * 1. 两数之和 Two Sum
+	 * 给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
+	 */
 	public static int[] twoSum(int[] nums, int target) {
 		int[] res = new int[2];
 		HashMap<Integer, Integer> map = new HashMap<>();
@@ -26,6 +29,155 @@ public class LeetCodeTest {
 			}
 		}
 		return res;
+	}
+
+	/*
+	 * 2. 两数相加 Add Two Numbers
+	 * 给出两个非空的链表用来表示两个非负的整数。其中它们各自的位数是按照逆序的方式存储的，并且它们的每个节点只能存储一位数字。
+	 * 如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+	 */
+	static class ListNode {
+		int val;
+		ListNode next;
+		public ListNode(int val) { this.val = val; }
+	}
+	public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+		ListNode head = new ListNode(0), node = head;
+		int remain = 0;
+		while (l1 != null || l2 != null) {
+			int val = remain;
+			if (l1 != null) {
+				val += l1.val;
+				l1 = l1.next;
+			}
+			if (l2 != null) {
+				val += l2.val;
+				l2 = l2.next;
+			}
+			remain = val / 10;
+			node.next = new ListNode(val % 10);
+			node = node.next;
+		}
+		if (remain == 1) {
+			node.next = new ListNode(remain);
+		}
+		return head.next;
+	}
+
+
+	public static int lengthOfLongestSubstring(String s) {
+		if (s.length() == 1) return 1;
+		char[] chars = s.toCharArray();
+		int total = 0, sum = 0;
+		StringBuilder sb = new StringBuilder(chars.length);
+		for (int i = 0; i < chars.length; i++) {
+			String str = String.valueOf(chars[i]);
+			if (sb.toString().contains(str)) {
+				total = total > sum ? total : sum;
+				sb.delete(0,sb.indexOf(str) + 1);
+				sum = sb.length();
+			}
+			sum ++;
+			sb.append(chars[i]);
+		}
+		total = total > sum ? total : sum;
+		return total;
+	}
+
+	/*
+	 * 实现pow(x, n)，计算x的n次幂函数
+	 *
+	 */
+	public static double myPow(double x, int n) {
+		double result = 1.0;
+		if (x == 1 || x == 0) return result;
+		if (n == 0) return 1;
+		for (int i = n; i != 0; i /= 2) {
+			if (i % 2 != 0) result *= x;
+			x *= x;
+		}
+		return  n > 0 ? result : 1 / result;
+	}
+
+	/*
+	 * 如果一个数每个位数拆开之后的平方和最后能得到1，则是个快乐数。
+	 */
+	public static boolean isHappy(int n) {
+		if (n <= 0) return false;
+		if (n == 1) return true;
+		Function<Integer, Integer> func = (x) -> Integer.toString(x).chars()
+				.parallel().map(c -> c - '0').map(i -> i*i).reduce(0, (a, b) -> a + b);
+		int result = func.apply(n);
+		while (result != 1) {
+			result = func.apply(result);
+			if (result < 10 && result > 1) return false;
+		}
+		return true;
+	}
+
+	/* 102. 二叉树的层序遍历 Binary Tree Level Order Traversal
+	 *  二叉树层序遍历(每层从左到右访问所有节点)
+	 *   3			[
+     *  / \			 [3],
+     * 9  20	->   [9, 20],
+     *   /  \		 [15, 7]
+     *  15   7      ]
+	 */
+	public List<List<Integer>> levelOrder(TreeNode root) {
+		List<List<Integer>> list = new ArrayList<>();
+		list.stream();
+		if (root == null) return list;
+		Queue<TreeNode> queue = new LinkedList<>();
+		queue.offer(root);
+		while (!queue.isEmpty()) {
+			int size = queue.size();
+			List<Integer> subList = new ArrayList<>();
+			while (size-- != 0) {
+				TreeNode node = queue.poll();
+				subList.add(node.val);
+				if (node.left != null) { queue.offer(node.left); }
+				if (node.right != null) { queue.offer(node.right); }
+				//Optional.ofNullable(node.left).ifPresent(queue::offer);
+				//Optional.ofNullable(node.right).ifPresent(queue::offer);
+			}
+			list.add(subList);
+		}
+		return list;
+	}
+
+	/* 136. 只出现一次的数字 Single Number
+	 *	给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+	 *
+     * 交换律：a ^ b ^ c <=> a ^ c ^ b
+     * 任何数于0异或为任何数 0 ^ n => n
+     * 相同的数异或为0: n ^ n => 0
+	 */
+	public static int singleNumber(int[] nums) {
+		int result = 0;
+		for (int i = 0; i < nums.length; i++) {
+			result ^= nums[i];
+		}
+		return result;
+	}
+
+	/* 560. 和为K的子数组 Subarray Sum Equals K
+	 * 给定一个整数数组和一个整数 k，你需要找到该数组中和为 k 的连续的子数组的个数。
+	 *
+	 * 使用map来存储连续和出现的次数。
+	 */
+	public static int subarraySum(int[] nums, int k) {
+		int total = 0;
+		Map<Integer, Integer> map = new HashMap<>(nums.length);
+		int sum = 0;
+		map.put(sum, 1);
+		for (int i = 0; i < nums.length; i++) {
+			sum += nums[i];
+			if (map.containsKey(sum - k)) {
+				total += map.get(sum - k);
+			}
+			map.put(sum, map.getOrDefault(sum, 0) + 1);
+		}
+		return total;
 	}
 
 	public static int removeElement(int[] nums, int val) {
@@ -57,6 +209,16 @@ public class LeetCodeTest {
 			i++;
 		}
 		return i;
+	}
+
+	static class TreeNode {
+		int val;
+		TreeNode left;
+		TreeNode right;
+
+		TreeNode(int x) {
+			val = x;
+		}
 	}
 
 	public static TreeNode sortedArrayToBST(int[] nums) {
@@ -206,12 +368,3 @@ public class LeetCodeTest {
 	}
 }
 
-class TreeNode {
-	int val;
-	TreeNode left;
-	TreeNode right;
-
-	TreeNode(int x) {
-		val = x;
-	}
-}
